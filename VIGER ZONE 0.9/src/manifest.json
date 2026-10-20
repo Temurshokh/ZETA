@@ -1,0 +1,26 @@
+{
+  "name": "ZETA by VIGER",
+  "short_name": "ZETA",
+  "description": "The best collection of web games and tools — Eng zo'r web o'yinlar va vositalar to'plami",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020205",
+  "theme_color": "#00e5ff",
+  "orientation": "portrait-primary",
+  "lang": "uz",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["games", "utilities", "finance"],
+  "scope": "./"
+}

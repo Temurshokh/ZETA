@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZETA | QR Kod</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2><a href="../tools.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i>
+          ZETA</a></h2>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main style="max-width: 400px">
+    <section class="glass-panel text-center">
+      <h3>📱 QR Kod Generator</h3>
+      <input type="text" id="qr-input" placeholder="Havola yoki matn..."
+        style="width: 100%; padding: 0.85rem; border-radius: 10px; border: none; margin-bottom: 0.75rem; background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.9rem;" />
+      <button onclick="generateQR()" class="btn" style="width: 100%">Yaratish</button>
+      <div id="qr-output"
+        style="margin-top: 1.25rem; min-height: 140px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 0.75rem;">
+      </div>
+    </section>
+  </main>
+  <script>
+    function generateQR() {
+      const input = document.getElementById("qr-input").value;
+      const output = document.getElementById("qr-output");
+      if (!input) return;
+      output.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(input)}" alt="QR Code" style="border-radius:8px;">`;
+      if (window.addXP) addXP(2);
+    }
+  </script>
+</body>
+
+</html>

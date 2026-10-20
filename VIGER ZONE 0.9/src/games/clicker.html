@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>XP Clicker | VIGER ZONE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body class="game-page">
+  <header>
+    <div class="logo">
+      <h2>
+        <a href="../games.html" style="text-decoration: none; color: inherit">&larr; VIGER ZONE</a>
+      </h2>
+    </div>
+    <div id="xp-display"></div>
+  </header>
+
+  <main class="text-center" style="
+        height: 80dvh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      ">
+    <h2>XP Clicker</h2>
+    <p>Tugmani bosing va XP yig'ing!</p>
+
+    <button id="click-btn" onclick="clickAction()" style="
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          border: none;
+          background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
+          color: white;
+          font-size: 1.5rem;
+          cursor: pointer;
+          box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+          transition: transform 0.1s;
+        ">
+      BOSS!
+    </button>
+
+    <div id="combo-text" style="margin-top: 2rem; font-size: 1.2rem; min-height: 2rem"></div>
+  </main>
+
+  <script>
+    let clicks = 0;
+
+    function clickAction() {
+      const btn = document.getElementById("click-btn");
+      btn.style.transform = "scale(0.95)";
+      setTimeout(() => (btn.style.transform = "scale(1)"), 100);
+
+      clicks++;
+
+      // Visual effect
+      const combo = document.getElementById("combo-text");
+
+      if (clicks % 10 === 0) {
+        if (window.addXP) addXP(5);
+        combo.textContent = "🔥 Super! +5 XP";
+        combo.style.color = "var(--primary-accent)";
+      } else {
+        if (window.addXP) addXP(1);
+        combo.textContent = "+1 XP";
+        combo.style.color = "white";
+      }
+    }
+  </script>
+</body>
+
+</html>

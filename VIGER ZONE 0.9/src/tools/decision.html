@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ZETA | Qaror</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .decision-page {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+            text-align: center;
+        }
+
+        .decision-page h1 {
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            margin-bottom: 0;
+        }
+
+        .decision-page>p {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: -0.25rem;
+            margin-bottom: 0;
+        }
+
+        /* ── Options Box ── */
+        .options-box {
+            width: 100%;
+            padding: 1.25rem;
+            position: relative;
+        }
+
+        .option-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .opt-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+        }
+
+        .opt-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 3px hsla(260, 95%, 75%, 0.1);
+        }
+
+        .opt-input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .add-opt-btn {
+            width: 48px !important;
+            min-width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+            font-size: 1.1rem;
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.4rem;
+            padding: 0 0.25rem;
+        }
+
+        .char-counter {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .char-counter.warn {
+            color: var(--warning);
+        }
+
+        .char-counter.limit {
+            color: var(--danger);
+        }
+
+        .option-count {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Option Tags ── */
+        .option-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+            min-height: 0;
+        }
+
+        .option-tag {
+            padding: 0.5rem 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.2s;
+        }
+
+        .option-tag:active {
+            transform: scale(0.95);
+            background: rgba(255, 80, 80, 0.1);
+        }
+
+        .option-tag .remove-x {
+            cursor: pointer;
+            opacity: 0.4;
+            font-size: 0.75rem;
+            transition: opacity 0.2s;
+            padding: 2px;
+        }
+
+        .option-tag .remove-x:hover {
+            opacity: 1;
+            color: var(--danger);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ── Result Display ── */
+        .result-display {
+            width: 100%;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, hsla(260, 95%, 55%, 0.08), transparent 70%);
+            border-radius: var(--radius-xl);
+            border: 2px dashed hsla(0, 0%, 100%, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .result-display.has-result {
+            border-color: hsla(260, 95%, 75%, 0.2);
+            background: radial-gradient(circle at center, hsla(260, 95%, 55%, 0.15), transparent 70%);
+        }
+
+        .result-text {
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text-color);
+            z-index: 2;
+            padding: 0.5rem 1rem;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .result-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            z-index: 2;
+        }
+
+        .shuffling {
+            animation: shake 0.08s infinite;
+            color: var(--primary) !important;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            25% {
+                transform: translate(-1px, -1px);
+            }
+
+            50% {
+                transform: translate(2px, 0px);
+            }
+
+            75% {
+                transform: translate(-2px, 1px);
+            }
+
+            100% {
+                transform: translate(1px, -1px);
+            }
+        }
+
+        /* ── Pick Button ── */
+        .pick-btn {
+            width: auto !important;
+            min-width: 200px;
+            font-size: 1.05rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 800;
+            gap: 0.5rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pick-btn::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .pick-btn:active::after {
+            opacity: 1;
+        }
+
+        .clear-all-btn {
+            width: auto !important;
+            padding: 0.4rem 1rem !important;
+            font-size: 0.8rem;
+            border-radius: 50px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .clear-all-btn:active {
+            opacity: 1;
+        }
+
+        /* ── Confetti ── */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h2 onclick="location.href='../index.html'" style="cursor: pointer;">ZETA</h2>
+        </div>
+        <nav class="nav-links"></nav>
+    </header>
+
+    <main>
+        <div class="decision-page">
+            <h1 data-trn="tool-decision-title">🎯 Qaror Tanlash</h1>
+            <p data-trn="tool-decision-desc">Tanlay olmayapsizmi? Bizga qo'yib bering!</p>
+
+            <!-- Options Input -->
+            <div class="options-box glass-panel">
+                <div class="option-input-wrapper">
+                    <input type="text" id="opt-input" class="opt-input" placeholder="Variant kiriting..." maxlength="80"
+                        onkeypress="if(event.key==='Enter') addOption()" oninput="updateOptCounter(this)">
+                    <button class="btn btn-primary add-opt-btn" onclick="addOption()"><i
+                            class="fas fa-plus"></i></button>
+                </div>
+                <div class="input-footer">
+                    <span class="char-counter" id="opt-counter">0/80</span>
+                    <span class="option-count" id="opt-count"></span>
+                </div>
+                <div class="option-list" id="opt-list">
+                    <!-- Tags here -->
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-display" id="result-box">
+                <div class="result-text" id="result-text">?</div>
+                <div class="result-hint" id="result-hint">Variantlarni qo'shing va TANLASH bosing</div>
+            </div>
+
+            <!-- Actions -->
+            <button class="btn btn-primary pick-btn" onclick="pickRandom()">
+                <i class="fas fa-magic"></i> TANLASH
+            </button>
+
+            <button class="btn btn-glass clear-all-btn" onclick="clearOptions()">
+                <i class="fas fa-broom"></i> Barchasini o'chirish
+            </button>
+        </div>
+    </main>
+
+    <nav class="tab-bar"></nav>
+
+    <script src="../js/xp.js"></script>
+    <script>
+        const MAX_OPT_LEN = 80;
+        let options = [];
+
+        function updateOptCounter(input) {
+            const counter = document.getElementById('opt-counter');
+            const len = input.value.length;
+            counter.textContent = `${len}/${MAX_OPT_LEN}`;
+            counter.classList.toggle('warn', len > 60);
+            counter.classList.toggle('limit', len >= MAX_OPT_LEN);
+        }
+
+        function addOption() {
+            const input = document.getElementById('opt-input');
+            const text = input.value.trim().slice(0, MAX_OPT_LEN);
+            if (!text) {
+                shakeElement(input);
+                return;
+            }
+            if (options.includes(text)) {
+                shakeElement(input);
+                return;
+            }
+            options.push(text);
+            renderOptions();
+            input.value = '';
+            document.getElementById('opt-counter').textContent = `0/${MAX_OPT_LEN}`;
+            input.focus();
+        }
+
+        function removeOption(index) {
+            options.splice(index, 1);
+            renderOptions();
+        }
+
+        function renderOptions() {
+            const list = document.getElementById('opt-list');
+            const countEl = document.getElementById('opt-count');
+            countEl.textContent = options.length > 0 ? `${options.length} ta variant` : '';
+
+            list.innerHTML = options.map((opt, i) => `
+                <div class="option-tag">
+                    ${escapeHTML(opt)}
+                    <i class="fas fa-times remove-x" onclick="removeOption(${i})"></i>
+                </div>
+            `).join('');
+        }
+
+        function clearOptions() {
+            options = [];
+            renderOptions();
+            const resText = document.getElementById('result-text');
+            resText.innerText = '?';
+            document.getElementById('result-hint').textContent = "Variantlarni qo'shing va TANLASH bosing";
+            document.getElementById('result-box').classList.remove('has-result');
+        }
+
+        function pickRandom() {
+            if (options.length < 2) {
+                const input = document.getElementById('opt-input');
+                shakeElement(input);
+                input.placeholder = 'Kamida 2 variant kerak!';
+                setTimeout(() => input.placeholder = 'Variant kiriting...', 2000);
+                return;
+            }
+
+            const resText = document.getElementById('result-text');
+            const hintEl = document.getElementById('result-hint');
+            resText.classList.add('shuffling');
+            hintEl.textContent = 'Tanlanmoqda...';
+
+            let counter = 0;
+            const interval = setInterval(() => {
+                resText.innerText = options[Math.floor(Math.random() * options.length)];
+                counter++;
+                if (counter > 25) {
+                    clearInterval(interval);
+                    resText.classList.remove('shuffling');
+                    const final = options[Math.floor(Math.random() * options.length)];
+                    resText.innerText = final;
+                    hintEl.textContent = '🎉 Tanlandi!';
+                    document.getElementById('result-box').classList.add('has-result');
+
+                    // Mini celebration
+                    createMiniConfetti();
+
+                    if (window.giveXP) window.giveXP(3);
+                }
+            }, 50);
+        }
+
+        function createMiniConfetti() {
+            const box = document.getElementById('result-box');
+            const colors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ffffff'];
+            for (let i = 0; i < 20; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'confetti';
+                dot.style.left = Math.random() * 100 + '%';
+                dot.style.top = Math.random() * 100 + '%';
+                dot.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                dot.style.width = (4 + Math.random() * 8) + 'px';
+                dot.style.height = dot.style.width;
+                dot.style.opacity = Math.random() * 0.8 + 0.2;
+                dot.style.animation = `confettiFade ${0.5 + Math.random() * 1}s ease-out forwards`;
+                box.appendChild(dot);
+                setTimeout(() => dot.remove(), 2000);
+            }
+        }
+
+        function shakeElement(el) {
+            el.style.animation = 'none';
+            el.offsetHeight;
+            el.style.animation = 'inputShake 0.4s ease';
+            el.style.borderColor = 'var(--danger)';
+            setTimeout(() => {
+                el.style.borderColor = '';
+                el.style.animation = '';
+            }, 600);
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Extra animations
+        const extraStyle = document.createElement('style');
+        extraStyle.textContent = `
+            @keyframes inputShake {
+                0%, 100% { transform: translateX(0); }
+                20% { transform: translateX(-6px); }
+                40% { transform: translateX(6px); }
+                60% { transform: translateX(-4px); }
+                80% { transform: translateX(4px); }
+            }
+            @keyframes confettiFade {
+                0% { transform: scale(0) translateY(0); opacity: 1; }
+                50% { transform: scale(1.2) translateY(-10px); opacity: 0.8; }
+                100% { transform: scale(0.5) translateY(20px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(extraStyle);
+    </script>
+</body>
+
+</html>

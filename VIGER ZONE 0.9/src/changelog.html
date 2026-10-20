@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#00e5ff" />
+    <title>Yangiliklar | ZETA</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="js/core/state.js" defer></script>
+    <script src="js/core/telegram.js" defer></script>
+    <script src="js/xp.js" defer></script>
+    <script src="js/lang.js" defer></script>
+    <script src="js/main.js"></script>
+    <style>
+        body {
+            overflow-x: hidden;
+            background: #000;
+            color: white;
+        }
+
+        .update-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardFadeInUp 0.6s forwards;
+        }
+
+        @keyframes cardFadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .version-tag {
+            background: var(--primary-accent);
+            color: #fff;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .version-tag.new {
+            background: linear-gradient(45deg, #10b981, #00ffcc);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px #10b981;
+            }
+
+            to {
+                box-shadow: 0 0 15px #10b981, 0 0 30px rgba(16, 185, 129, 0.5);
+            }
+        }
+
+        .timeline {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .timeline-item {
+            min-width: 160px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .timeline-item.active {
+            opacity: 1;
+            border-color: var(--primary-accent);
+            background: rgba(0, 255, 255, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.1);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            gap: 10px;
+            line-height: 1.4;
+            align-items: flex-start;
+        }
+
+        .feature-list li::before {
+            content: '';
+            display: none;
+        }
+
+        .roadmap-section {
+            background: linear-gradient(45deg, rgba(20, 20, 30, 0.8), rgba(40, 40, 60, 0.8));
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            padding-bottom: 40px;
+        }
+
+        .btn-glass {
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-accent);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: fall linear forwards;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .feature-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+    <script src="js/core/music.js" defer></script>
+    <script src="js/core/navigation.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h2>
+                <a href="index.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i>
+                    ZETA</a>
+            </h2>
+        </div>
+        <div id="xp-display"></div>
+    </header>
+
+    <main style="max-width: 800px; margin: 0 auto; padding: 20px">
+
+        <!-- HERO UPDATE v0.9 -->
+        <section class="update-card"
+            style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15)); border-color: #fbbf24;">
+            <div class="update-header">
+                <h2 style="margin:0; color: #fff;">ZETA v0.9 — Virtual Aurum 💰✨</h2>
+                <span class="version-tag new">v0.9</span>
+            </div>
+
+            <div class="feature-highlight">
+                <strong>🆕 Eng muhimi:</strong> ZETA ga yangi virtual valyuta — <strong>VAU (Virtual Aurum)</strong>
+                qo'shildi!
+                O'yinlar bo'limida risk o'yinlari bilan VAU yutib oling yoki yo'qoting!
+            </div>
+
+            <ul class="feature-list"
+                style="font-size: 1rem; gap: 10px; display: flex; flex-direction: column; margin: 15px 0;">
+                <li>💰 <strong>VAU Valyutasi:</strong> Har bir foydalanuvchi 200 VAU bilan boshlaydi</li>
+                <li>🎲 <strong>VAU O'yinlar:</strong> Tanga Tashlash, Sirli Quti, Risk Narvon</li>
+                <li>🏆 <strong>Yutuqlar + VAU:</strong> Har bir yutuq uchun 5 VAU mukofot</li>
+                <li>🎰 <strong>Lucky Spin:</strong> Endi ba'zan VAU ham beradi</li>
+                <li>📱 <strong>Mobil Moslashuv:</strong> Barcha yangi o'yinlar telefonda mukammal ishlaydi</li>
+            </ul>
+
+            <div id="reward-box-09"
+                style="margin-top: 15px; padding: 12px; background: rgba(251, 191, 36, 0.15); border: 1px solid #fbbf24; border-radius: 8px; display: none;">
+                <span>🎁 Bonus: +25 XP + 10 VAU v0.9 yangiliklarini o'qiganingiz uchun!</span>
+            </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <h3 style="margin: 30px 0 15px;">Rivojlanish Tarixi 🚀</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.1 — Start</div>
+                <ul class="feature-list">
+                    <li>✅ Bosh Sahifa</li>
+                    <li>✅ O'yinlar</li>
+                    <li>✅ Kripto narxlar</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.2 — Mobil</div>
+                <ul class="feature-list">
+                    <li>✅ 9:16+-</li>
+                    <li>✅ Mahoraga</li>
+                    <li>✅ Tuzatishlar</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.3 — Kripto+</div>
+                <ul class="feature-list">
+                    <li>✅ Market Details</li>
+                    <li>✅ Sevimlilar ⭐</li>
+                    <li>✅ Mobil tuzatish</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.4 — O'yinlar</div>
+                <ul class="feature-list">
+                    <li>✅ Bug Fixes</li>
+                    <li>✅ Mobile+</li>
+                    <li>✅ New UX</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.5 — Charts</div>
+                <ul class="feature-list">
+                    <li>✅ Kripto grafik</li>
+                    <li>✅ Kripto update</li>
+                    <li>✅ 3 xil mavzu</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.6 — Blue</div>
+                <ul class="feature-list">
+                    <li>✅ Yutuqlar tizimi</li>
+                    <li>✅ Flappy Jump</li>
+                    <li>✅ +3 ta vosita</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.7 — LTS ⚡</div>
+                <ul class="feature-list">
+                    <li>✅ Telegram SDK</li>
+                    <li>✅ Lucky-Spin</li>
+                    <li>✅ Yangi Logo</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div style="font-weight: bold; color: #fff;">v0.8 — OST 🎵</div>
+                <ul class="feature-list">
+                    <li>✅ Fon musiqasi</li>
+                    <li>✅ Bug Fixes</li>
+                    <li>✅ Migration</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item active">
+                <div style="font-weight: bold; color: var(--accent-brand);">v0.9 — VAU 💰</div>
+                <ul class="feature-list">
+                    <li>✅ Virtual Aurum</li>
+                    <li>✅ VAU O'yinlar</li>
+                    <li>✅ Yutuq + VAU</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ROADMAP -->
+        <h3 style="margin: 40px 0 15px;">Reja v1.0 💣</h3>
+        <section class="update-card roadmap-section" style="opacity: 1; transform: none; animation: none;">
+            <div style="margin-bottom: 12px; font-style: italic; color: #ffa500; font-weight: bold;">
+                Tez kunda...
+            </div>
+            <ul class="feature-list">
+                <li>🤖 AI Chatbot — ZETA ichida yordamchi</li>
+                <li>🏪 XP Shop — XP bilan tema sotib olish</li>
+                <li>📈 Kripto ogohlantirishlari</li>
+                <li>🌐 Multi-device sync</li>
+            </ul>
+        </section>
+
+        <!-- ACTIONS -->
+        <div class="action-buttons">
+            <button class="btn-glass" onclick="copyUpdateText()">
+                <i class="fas fa-copy"></i> Nusxalash
+            </button>
+            <button class="btn-glass" onclick="shareTelegram()">
+                <i class="fab fa-telegram"></i> Ulashish
+            </button>
+            <a href="https://t.me/VIGER_ZONE" target="_blank" class="btn-glass">
+                <i class="fas fa-bug"></i> Xato haqida yozish
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        // XP Reward Logic — v0.9
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                // v0.9 Reward
+                const claimed09 = localStorage.getItem('zeta_changelog_reward_0.9');
+                if (!claimed09 && window.addXP) {
+                    addXP(25);
+                    // Also give 10 VAU bonus
+                    if (window.ZetaState) ZetaState.addVAU(10);
+                    localStorage.setItem('zeta_changelog_reward_0.9', 'true');
+                    // Mark reader achievement
+                    localStorage.setItem('zeta_changelog_reward_0.7', 'true');
+
+                    const box = document.getElementById('reward-box-09');
+                    if (box) {
+                        box.style.display = 'block';
+                        createConfetti();
+                    }
+                    // Telegram haptic
+                    if (window.ZetaTelegram) ZetaTelegram.hapticNotification('success');
+                } else if (claimed09) {
+                    const box = document.getElementById('reward-box-09');
+                    if (box) {
+                        box.style.display = 'block';
+                        box.style.background = 'rgba(255, 255, 255, 0.05)';
+                        box.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        const lang = localStorage.getItem('zeta_settings') ? JSON.parse(localStorage.getItem('zeta_settings')).lang : 'uz';
+                        if (lang === 'uz') box.innerHTML = '✅ Siz allaqachon +25 XP va +10 VAU oldingiz.';
+                        else if (lang === 'ru') box.innerHTML = '✅ Вы уже получили +25 XP и +10 VAU.';
+                        else box.innerHTML = '✅ You already claimed +25 XP and +10 VAU.';
+                    }
+                }
+            }, 1200);
+        });
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = ['#00e5ff', '#7c4dff', '#ffffff', '#ff00ff', '#fbbf24', '#3b82f6'][Math.floor(Math.random() * 6)];
+                conf.style.animationDuration = Math.random() * 2 + 3 + 's';
+                conf.style.opacity = Math.random();
+                conf.style.width = (5 + Math.random() * 10) + 'px';
+                conf.style.height = conf.style.width;
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 5000);
+            }
+        }
+
+        function copyUpdateText() {
+            const text = `ZETA v0.9 — Virtual Aurum 💰✨
+
+💰 Virtual Aurum (VAU) valyutasi
+🎲 Risk o'yinlar: Tanga, Sirli Quti, Risk Narvon
+🏆 Yutuqlar endi VAU ham beradi
+🎰 Lucky Spin da VAU bonuslari
+
+Ko'ring: https://t.me/VIGER_ZONE`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Nusxalandi! / Copied!");
+            });
+        }
+
+        function shareTelegram() {
+            const text = encodeURIComponent("ZETA v0.9 — Virtual Aurum 💰✨\n\n💰 VAU valyutasi\n🎲 Risk o'yinlar\n🏆 Yutuqlar + VAU\n🎰 Lucky Spin VAU bonuslari");
+            window.open(`https://t.me/share/url?url=https://t.me/VIGER_ZONE&text=${text}`, '_blank');
+        }
+
+        if (typeof applyLanguage === 'function') {
+            applyLanguage();
+        }
+    </script>
+    <nav class="tab-bar"></nav>
+</body>
+
+</html>

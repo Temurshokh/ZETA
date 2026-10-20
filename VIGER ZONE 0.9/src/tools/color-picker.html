@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZETA | Rang Tanlash</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2><a href="../tools.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i>
+          ZETA</a></h2>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main style="max-width: 400px">
+    <section class="glass-panel text-center">
+      <h3>🎨 Rang Tanlagich</h3>
+      <input type="color" id="color-picker" oninput="updateColorVal()"
+        style="width: 120px; height: 120px; border: none; cursor: pointer; background: none; margin: 1.5rem 0;" />
+      <p id="color-val" style="font-family: monospace; font-size: 1.8rem; margin-bottom: 1.5rem">#000000</p>
+      <button onclick="copyColor()" class="btn btn-glass" style="width: 100%">Nusxalash</button>
+    </section>
+  </main>
+  <script>
+    function updateColorVal() {
+      const val = document.getElementById("color-picker").value;
+      document.getElementById("color-val").textContent = val;
+      document.getElementById("color-val").style.color = val;
+    }
+    function copyColor() {
+      const val = document.getElementById("color-picker").value;
+      navigator.clipboard.writeText(val);
+      alert("Nusxalandi: " + val);
+      if (window.addXP) addXP(1);
+    }
+  </script>
+</body>
+
+</html>

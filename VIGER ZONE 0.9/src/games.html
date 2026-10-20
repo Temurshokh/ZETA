@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#00e5ff" />
+    <title>ZETA | O'yinlar</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/vau-games.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="js/core/state.js" defer></script>
+    <script src="js/core/telegram.js" defer></script>
+    <script src="js/xp.js" defer></script>
+    <script src="js/lang.js" defer></script>
+    <script src="js/main.js"></script>
+    <style>
+        /* Specific tweaks for game icons - Now flexible */
+        .game-icon {
+            aspect-ratio: 16/9;
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+        }
+
+        .game-card {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .game-icon {
+                font-size: 1.8rem;
+                border-radius: 10px;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .game-icon {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <script src="js/core/music.js" defer></script>
+    <script src="js/core/navigation.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h2>ZETA</h2>
+
+        </div>
+        <nav class="nav-links"></nav>
+    </header>
+
+    <main>
+
+        <section class="grid-2">
+            <!-- Snake -->
+            <a href="games/snake.html" class="glass-panel game-card"
+                onclick="trackGame('Snake', '🐍', 'games/snake.html', '#10b981')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #10b981 0%, #059669 100%); color: white;">
+                    🐍
+                </div>
+                <h3>Ilon O'yini</h3>
+                <p>Klassik iloncha</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Cube Run 3D -->
+            <a href="games/cube-run.html" class="glass-panel game-card"
+                onclick="trackGame('Cube Run', 'fas fa-cube', 'games/cube-run.html', '#3b82f6')">
+                <div class="game-icon"
+                    style="background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%); color: white;">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h3>Cube Run 3D</h3>
+                <p>Cheksiz yugurish</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Space Tunnel 3D -->
+            <a href="games/space-tunnel.html" class="glass-panel game-card"
+                onclick="trackGame('Space Tunnel', 'fas fa-rocket', 'games/space-tunnel.html', '#0f172a')">
+                <div class="game-icon"
+                    style="background: linear-gradient(135deg, #0f172a 0%, #4338ca 100%); color: #818cf8;">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Space Tunnel</h3>
+                <p>Kosmik tunnel</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Neon Race 3D -->
+            <a href="games/race.html" class="glass-panel game-card"
+                onclick="trackGame('Neon Racer', 'fas fa-car-side', 'games/race.html', '#be123c')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #be123c 0%, #f43f5e 100%); color: white;">
+                    <i class="fas fa-car-side"></i>
+                </div>
+                <h3>Neon Racer</h3>
+                <p>3D Poyga</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Neon Pong -->
+            <a href="games/neon-pong.html" class="glass-panel game-card"
+                onclick="trackGame('Neon Pong', 'fas fa-table-tennis-paddle-ball', 'games/neon-pong.html', '#000000')">
+                <div class="game-icon"
+                    style="background: linear-gradient(135deg, #000000 0%, #10b981 100%); color: #10b981;">
+                    <i class="fas fa-table-tennis-paddle-ball"></i>
+                </div>
+                <h3>Neon Pong</h3>
+                <p>Stol tennisi</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Memory -->
+            <a href="games/memory.html" class="glass-panel game-card"
+                onclick="trackGame('Xotira', 'fas fa-brain', 'games/memory.html', '#84fab0')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); color: white;">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Xotira</h3>
+                <p>Kartalarni top</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- XP Clicker -->
+            <a href="games/clicker.html" class="glass-panel game-card"
+                onclick="trackGame('XP Clicker', 'fas fa-bolt', 'games/clicker.html', '#3b82f6')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #3b82f6 0%, #2563eb 100%); color: white;">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>XP Clicker</h3>
+                <p>XP to'pla</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- O'rmon Siri (Story) -->
+            <a href="games/story.html" class="glass-panel game-card"
+                onclick="trackGame('O\'rmon Siri', 'fas fa-book-open', 'games/story.html', '#9333ea')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #9333ea 0%, #c084fc 100%); color: white;">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>O'rmon Siri</h3>
+                <p>Interaktiv hikoya</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Mini City 3D -->
+            <a href="games/city.html" class="glass-panel game-card"
+                onclick="trackGame('Mini City', 'fas fa-city', 'games/city.html', '#16a34a')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #16a34a 0%, #4ade80 100%); color: white;">
+                    <i class="fas fa-city"></i>
+                </div>
+                <h3>Mini City</h3>
+                <p>Ochiq dunyo</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Archery 2D -->
+            <a href="games/archery.html" class="glass-panel game-card"
+                onclick="trackGame('Archery 2D', 'fas fa-bullseye', 'games/archery.html', '#d97706')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #d97706 0%, #fbbf24 100%); color: white;">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Archery 2D</h3>
+                <p>Kamon otish</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Escape Road -->
+            <a href="games/escape-road.html" class="glass-panel game-card"
+                onclick="trackGame('Escape Road', 'fas fa-road', 'games/escape-road.html', '#4c1d95')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #4c1d95 0%, #8b5cf6 100%); color: white;">
+                    <i class="fas fa-road"></i>
+                </div>
+                <h3>Escape Road</h3>
+                <p>Politsiyadan qoch</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Crossy Road -->
+            <a href="crossy-road.html" class="glass-panel game-card"
+                onclick="trackGame('Crossy Road', '🐔', 'crossy-road.html', '#FF9A9E')">
+                <div class="game-icon"
+                    style="background: linear-gradient(45deg, #FF9A9E 0%, #FECFEF 100%); color: white;">
+                    🐔
+                </div>
+                <h3>Crossy Road</h3>
+                <p>Yo'ldan o't</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+
+            <!-- Flappy Jump -->
+            <a href="games/flappy.html" class="glass-panel game-card"
+                onclick="trackGame('Flappy Jump', 'fas fa-dove', 'games/flappy.html', '#fbbf24')">
+                <div class="game-icon"
+                    style="background: linear-gradient(120deg, #f59e0b 0%, #fbbf24 100%); color: white;">
+                    <i class="fas fa-dove"></i>
+                </div>
+                <h3>Flappy Jump</h3>
+                <p>Sakrab uch!</p>
+                <div class="mt-3"><span class="btn btn-glass"><i class="fas fa-play"></i> O'ynash</span></div>
+            </a>
+        </section>
+
+        <!-- Lucky Spin -->
+        <div id="lucky-spin-container" style="margin-top: 1.5rem;"></div>
+
+        <!-- VAU Games Section -->
+        <div id="vau-games-container" style="margin-top: 0.5rem;"></div>
+    </main>
+
+    <script src="js/lucky-spin.js"></script>
+    <script src="js/vau-games.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof LuckySpin !== 'undefined') {
+                LuckySpin.render('lucky-spin-container');
+            }
+            if (typeof VAUGames !== 'undefined') {
+                VAUGames.render('vau-games-container');
+            }
+        });
+    </script>
+
+    <nav class="tab-bar"></nav>
+
+    <script>
+        function trackGame(name, icon, url, color) {
+            if (window.logActivity) {
+                window.logActivity('game', name);
+            }
+            if (window.ZetaState) {
+                ZetaState.trackGame(name);
+            }
+            if (window.ZetaTelegram) {
+                ZetaTelegram.hapticImpact('light');
+            }
+        }
+    </script>
+
+</body>
+
+</html>

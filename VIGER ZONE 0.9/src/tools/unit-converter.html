@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ZETA — Unit Converter</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/xp.js" defer></script>
+    <script src="../js/lang.js" defer></script>
+    <script src="../js/main.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="../tools.html" style="text-decoration: none; color: inherit">
+                <h2><i class="fas fa-arrow-left"></i> Unit Converter</h2>
+            </a>
+        </div>
+    </header>
+
+    <main style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <section class="glass-panel" style="margin-top: 2rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted);">Qiymat</label>
+                    <input type="number" id="unit-input" class="btn-glass"
+                        style="width: 100%; text-align: left; padding: 12px; margin-top: 5px;" placeholder="0">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Kimdan</label>
+                        <select id="unit-from" class="btn-glass" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            <option value="m">Metr (m)</option>
+                            <option value="km">Kilometr (km)</option>
+                            <option value="cm">Santimetr (cm)</option>
+                            <option value="mm">Millimetr (mm)</option>
+                            <option value="in">Dyuym (in)</option>
+                            <option value="ft">Fut (ft)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Kimga</label>
+                        <select id="unit-to" class="btn-glass" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            <option value="m">Metr (m)</option>
+                            <option value="km">Kilometr (km)</option>
+                            <option value="cm">Santimetr (cm)</option>
+                            <option value="mm">Millimetr (mm)</option>
+                            <option value="in">Dyuym (in)</option>
+                            <option value="ft">Fut (ft)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div
+                    style="margin-top: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 14px; text-align: center;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Natija</div>
+                    <div id="unit-result" style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">0.00</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const units = {
+            m: 1,
+            km: 1000,
+            cm: 0.01,
+            mm: 0.001,
+            in: 0.0254,
+            ft: 0.3048
+        };
+
+        function convert() {
+            const val = parseFloat(document.getElementById('unit-input').value) || 0;
+            const from = document.getElementById('unit-from').value;
+            const to = document.getElementById('unit-to').value;
+
+            const inMeters = val * units[from];
+            const result = inMeters / units[to];
+
+            document.getElementById('unit-result').textContent = result.toFixed(result < 0.01 ? 6 : 2);
+        }
+
+        document.getElementById('unit-input').addEventListener('input', convert);
+        document.getElementById('unit-from').addEventListener('change', convert);
+        document.getElementById('unit-to').addEventListener('change', convert);
+    </script>
+
+    <nav class="tab-bar"></nav>
+</body>
+
+</html>

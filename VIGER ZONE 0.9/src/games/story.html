@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Sarguzasht | ZETA</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/game-ui.js" defer></script>
+  <script src="../js/xp.js" defer></script>
+  <style>
+    body {
+      background: #0f0f13;
+      color: #e0e0e0;
+      overflow-x: hidden;
+    }
+
+    .story-card {
+      background: rgba(30, 30, 40, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 16px;
+      /* Reduced padding from 24px */
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .story-image {
+      width: 100%;
+      height: 160px;
+      /* Reduced height from 200px */
+      background-color: #333;
+      background-image: linear-gradient(to bottom, #2c3e50, #000);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .story-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    .scene-title {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #10b981, #00ffcc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+    }
+
+    .story-text {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #fff;
+      text-shadow: 0 1px 2px black;
+      min-height: 80px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInText 0.5s forwards;
+    }
+
+    @keyframes fadeInText {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .choices-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 1.5rem;
+    }
+
+    .choice-btn {
+      text-align: left;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: slideInChoice 0.4s forwards;
+    }
+
+    .choice-btn:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .choice-btn:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .choice-btn:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .choice-btn:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes slideInChoice {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .choice-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #10b981;
+      transform: translateX(5px);
+    }
+
+    .choice-btn:active {
+      transform: scale(0.98);
+    }
+
+    .choice-btn i {
+      color: #10b981;
+      font-size: 1.1rem;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .badge.win {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .badge.danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #00ffcc);
+      transition: width 0.5s ease;
+    }
+
+    .game-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 15, 19, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+    }
+  </style>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body class="game-page">
+  <header class="game-header">
+    <a href="../games.html"
+      style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+      <i class="fas fa-arrow-left"></i> Chiqish
+    </a>
+    <div id="xp-display"></div>
+  </header>
+
+  <main style="max-width: 600px; margin: 0 auto; padding: 20px 10px">
+    <div class="story-card">
+      <div class="progress-bar">
+        <div class="progress-fill" id="story-progress" style="width: 0%;"></div>
+      </div>
+
+      <div id="story-img" class="story-image"></div>
+
+      <div class="badge-container">
+        <span class="badge" id="scene-type">🌲 Sarguzasht</span>
+        <span class="badge" id="scene-chapter" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Qism
+          1</span>
+      </div>
+
+      <h2 id="story-title" class="scene-title">O'rmondagi Sir</h2>
+
+      <div style="min-height: 100px;">
+        <p id="story-text" class="story-text">
+          Yuklanmoqda...
+        </p>
+      </div>
+
+      <div id="choices" class="choices-grid">
+        <!-- Buttons will be injected here -->
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Expanded story nodes with more content and choices
+    const storyNodes = {
+      0: {
+        title: "O'rmondagi Sir",
+        text: "Siz qorong'u, qalin o'rmonda uyg'ondingiz. Boshingiz og'riyapti va xotirangiz yo'q. Yoningizda faqat eski, zanglagan chiroq va bir parcha yirtiq xarita bor. Kun botmoqda, sovuq shamol esyapti. Uzoqda bo'rilar uvillamoqda...",
+        img: "https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?w=600&q=80",
+        type: "🌲 Boshlanish",
+        chapter: 1,
+        progress: 5,
+        choices: [
+          { text: "Chiroqni yoqib atrofni tekshirish", icon: "fa-lightbulb", next: 1 },
+          { text: "Eng baland daraxtga chiqib atrofga qarash", icon: "fa-tree", next: 2 },
+          { text: "Xaritani diqqat bilan o'rganish", icon: "fa-map", next: 7 },
+        ],
+      },
+      1: {
+        title: "Sirli Izlar",
+        text: "Chiroqni yoqdingiz. Xira nurda yerdagi g'alati, katta izlarni ko'rdingiz. Bu odamniki emas — balki ayiqniki? Izlar qalin butalar orasidagi qorong'u g'or tomon ketgan. Lekin o'rmon ichkarisidan ham qandaydir g'alati tovush eshitildi — go'yo kimdir yordam so'rayapti...",
+        img: "https://images.unsplash.com/photo-1508246328325-1e43e3f42145?w=600&q=80",
+        type: "🔦 Tadqiqot",
+        chapter: 2,
+        progress: 15,
+        choices: [
+          { text: "Izlardan borib g'orni tekshirish", icon: "fa-dungeon", next: 3 },
+          { text: "Tovush kelgan tomonga ehtiyotkorlik bilan yurish", icon: "fa-question-circle", next: 4 },
+          { text: "Chiroqni o'chirib butalar orasiga berkinish", icon: "fa-eye-slash", next: 8 },
+        ],
+      },
+      2: {
+        title: "Daraxt Tepasida",
+        text: "Baland daraxtga chiqsangiz, uzoqda, shimol tomonda olov yorug'ini ko'rdingiz. U yerda odamlar bo'lishi mumkin! G'arbda esa qandaydir qadimiy uy bor, derazalarida xira yorug' ko'rinadi. Lekin pastda bir nechta bo'ri soyasini ko'rdingiz — ular sizning hizingizni sezgan bo'lishi mumkin.",
+        img: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&q=80",
+        type: "👀 Kuzatish",
+        chapter: 2,
+        progress: 20,
+        choices: [
+          { text: "Pastga tushib olovga qarab yugurish", icon: "fa-running", next: 5 },
+          { text: "Qadimiy uy tomon ehtiyotkorlik bilan yurish", icon: "fa-house", next: 10 },
+          { text: "Daraxtda tunab, tong otishini kutish", icon: "fa-moon", next: 6 },
+        ],
+      },
+      3: {
+        title: "Xazina G'ori",
+        text: "G'orga kirdingiz. Dastlab qorong'u va nam edi, lekin ichkariga kirsangiz — hayratda qoldingiz! Bu qaroqchilarning yashirilgan xazinasi ekan! Oltinlar, kumush tangalar, qimmatbaho toshlar... Siz boyib ketdingiz! G'or orqasidan o'rmondan chiqish yo'lini ham topdingiz. Quyosh chiqmoqda va siz yangi hayotga qadam qo'ymoqdasiz.",
+        img: "https://images.unsplash.com/photo-1499566727020-881a8f334bf7?w=600&q=80",
+        type: "🏆 G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Qayta o'ynash", icon: "fa-redo", next: 0 }],
+        win: true,
+        xp: 50
+      },
+      4: {
+        title: "Zulmat Ichida",
+        text: "Siz tovush kelgan tomonga yurdingiz. Lekin o'rmon ichkarisiga kirgan sayin qorong'ulashdi. Tovush yo'qoldi — bu shunchaki shamol ekan. Endi siz qayerdaligingizni bilmayapsiz. Chiroq batareyasi tugab qoldi. Sovuq tunni yolg'iz o'tkazishga to'g'ri keladi...",
+        img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80",
+        type: "❌ Adashish",
+        typeClass: "danger",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [
+          { text: "Qayta urinib ko'rish", icon: "fa-undo", next: 0 }
+        ],
+      },
+      5: {
+        title: "Do'stona Sayyohlar",
+        text: "Olov oldiga bordingiz. U yerda bir guruh do'stona sayyohlar bor ekan. Ular sizni ko'rib hayron bo'lishdi, lekin issiq choy va go'shtli sho'rva berishdi. Kechasi sizga isinish uchun ko'rpa ham berishdi. Ertalab ular sizni eng yaqin shaharga olib ketishdi.",
+        img: "https://images.unsplash.com/photo-1533519519183-f381f9a2e343?w=600&q=80",
+        type: "🔥 Najot",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Sayyohlar bilan ketish (G'alaba)", icon: "fa-home", next: 0 }],
+        win: true,
+        xp: 40
+      },
+      6: {
+        title: "Muzlab Qolish",
+        text: "Daraxtda uxlab qoldingiz. Bo'rilar ketdi, lekin tun juda sovuq edi. Ertalab holsiz uyg'ondingiz, qo'l-oyoqlaringiz muzlab qolgan. Yo'l topishga kuchingiz qolmadi...",
+        img: "https://images.unsplash.com/photo-1518182170546-0766aa6bd6db?w=600&q=80",
+        type: "❄️ Sovuq",
+        typeClass: "danger",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "Qayta urinib ko'rish", icon: "fa-undo", next: 0 }],
+      },
+      7: {
+        title: "Qadimiy Xarita",
+        text: "Xaritani diqqat bilan o'rgandingiz. U juda eski bo'lsa-da, bitta joy qizil bilan belgilangan: 'Eski Tegirmon'. Xarita bo'yicha u yerdan daryo oqib o'tadi va u sizga xavfsizlikka olib chiqishi mumkin. Xaritada yana bir belgi bor — 'Ovchining kulbasi' deb yozilgan.",
+        img: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80",
+        type: "🗺️ Kashfiyot",
+        chapter: 2,
+        progress: 25,
+        choices: [
+          { text: "Eski Tegirmonni qidirish", icon: "fa-water", next: 9 },
+          { text: "Ovchining kulbasiga borish", icon: "fa-cabin", next: 11 },
+          { text: "Chiroqni yoqib boshqa joylarni tekshirish", icon: "fa-lightbulb", next: 1 }
+        ]
+      },
+      8: {
+        title: "Xavfli Kutish",
+        text: "Siz butalar orasiga berkindingiz va chiroqni o'chirdingiz. Bir necha daqiqadan so'ng yoningizdagi butalar shitirlab ketdi — katta ayiq! U sizning yoningizdan sekin o'tib ketdi. Yuragingiz tez urmoqda. Endi juda qorong'u bo'lib qoldi...",
+        img: "https://images.unsplash.com/photo-1535083783855-76ae62b2914e?w=600&q=80",
+        type: "🐻 Xavf",
+        chapter: 3,
+        progress: 35,
+        choices: [
+          { text: "Tong otishini kutish", icon: "fa-sun", next: 12 },
+          { text: "Tavakkal qilib zulmatda yurish", icon: "fa-hiking", next: 4 },
+          { text: "Ayiq ketgan tomonga ehtiyotkorlik bilan yurish", icon: "fa-paw", next: 13 }
+        ]
+      },
+      9: {
+        title: "Daryo Bo'yida",
+        text: "Xarita bo'yicha yurdingiz va nihoyat daryoni topdingiz. Suv shiddatli oqmoqda. Uzoqda eski tegirmonning qoldiqlari ko'rinadi. Lekin ko'prik yo'q — faqat yiqilgan daraxt tanasi suv ustida yotibdi...",
+        img: "https://images.unsplash.com/photo-1504280506541-aca14221903c?w=600&q=80",
+        type: "🌊 Sayohat",
+        chapter: 4,
+        progress: 60,
+        choices: [
+          { text: "Yiqilgan daraxtdan o'tishga harakat qilish", icon: "fa-tree", next: 14 },
+          { text: "Daryo bo'ylab yurish va sayoz joy izlash", icon: "fa-walking", next: 15 },
+          { text: "Tegirmon tomonga suzib o'tish", icon: "fa-swimmer", next: 16 }
+        ]
+      },
+      10: {
+        title: "Qadimiy Uy",
+        text: "Qadimiy uyga yaqinlashdingiz. Derazalardan xira sham yorug'i ko'rinmoqda. Eshik ochiq. Ichkaridan qandaydir qo'shiq ovozi eshitilmoqda — bu qo'rqinchli emas, aksincha, xotirjam qo'shiq...",
+        img: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600&q=80",
+        type: "🏚️ Sirli Joy",
+        chapter: 3,
+        progress: 40,
+        choices: [
+          { text: "Eshikni taqillatish", icon: "fa-hand", next: 17 },
+          { text: "Ehtiyotkorlik bilan ichkariga kirib ko'rish", icon: "fa-door-open", next: 18 },
+          { text: "Derazadan kuzatish", icon: "fa-eye", next: 19 }
+        ]
+      },
+      11: {
+        title: "Ovchining Kulbasi",
+        text: "Ovchining kulbasini topdingiz. U bo'sh, lekin ichkarida foydali narsalar bor: quritilgan go'sht, ko'rpa, va eng muhimi — kompas! Devorga yozilgan xabar: 'Shimolga boring — shaharga chiqasiz'.",
+        img: "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=600&q=80",
+        type: "🏕️ Panoh",
+        chapter: 3,
+        progress: 45,
+        choices: [
+          { text: "Kulbada tunash va ertalab shimolga yo'l olish", icon: "fa-bed", next: 20 },
+          { text: "Darhol shimolga yo'l olish", icon: "fa-compass", next: 5 },
+          { text: "Kulbani tekshirishni davom ettirish", icon: "fa-search", next: 21 }
+        ]
+      },
+      12: {
+        title: "Yangi Kun",
+        text: "Butalar orasida qiyin tun o'tkazganingizdan so'ng, nihoyat quyosh chiqdi. Endi atrofni ko'rish mumkin. Yaqinda daryo borligini eshityapsiz...",
+        img: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&q=80",
+        type: "🌅 Yangi Kun",
+        chapter: 4,
+        progress: 50,
+        choices: [
+          { text: "Daryo ovoziga qarab yurish", icon: "fa-water", next: 9 },
+          { text: "Quyosh tomon (sharqga) yurish", icon: "fa-sun", next: 5 }
+        ]
+      },
+      13: {
+        title: "Ayiq Ini",
+        text: "Ayiq ketgan tomonga ehtiyotkorlik bilan yurdingiz. U sizni katta g'orga olib keldi — bu ayiqning ini! Lekin ayiq uxlamoqda. G'or ichida qandaydir porloq narsani ko'rdingiz...",
+        img: "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=600&q=80",
+        type: "🐻 Xavfli G'or",
+        chapter: 4,
+        progress: 55,
+        choices: [
+          { text: "Jimgina chiqib ketish", icon: "fa-running", next: 12 },
+          { text: "Porloq narsani olishga harakat qilish", icon: "fa-gem", next: 22 }
+        ]
+      },
+      14: {
+        title: "Tegirmon (G'alaba)",
+        text: "Ehtiyotkorlik bilan yiqilgan daraxtdan o'tdingiz. Tegirmonga yetdingiz. U yerda keksa baliqchi yashaydi ekan. U sizni issiq ovqat bilan siyladi va ertasi kuni qayiqda shaharga olib bordi. Siz omads uxurang chiqib qoldingiz!",
+        img: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80",
+        type: "🏆 G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Qayta o'ynash", icon: "fa-redo", next: 0 }],
+        win: true,
+        xp: 45
+      },
+      15: {
+        title: "Sayoz O'tish Joyi",
+        text: "Daryo bo'ylab yurdingiz va nihoyat sayoz joyni topdingiz. Tez oqimga qaramay, ehtiyotkorlik bilan o'tib oldingiz. Narigi tomonda yo'l bor — u shaharga olib boradi!",
+        img: "https://images.unsplash.com/photo-1477346611705-65d1883cee1e?w=600&q=80",
+        type: "🏆 G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Yo'ldan yurish (G'alaba)", icon: "fa-road", next: 0 }],
+        win: true,
+        xp: 35
+      },
+      16: {
+        title: "Kuchli Oqim",
+        text: "Daryoga tushmoqchi bo'ldingiz, lekin oqim juda kuchli edi. Suvga oqib ketdingiz va qirg'oqqa chiqolmay qoldingiz...",
+        img: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=600&q=80",
+        type: "❌ Xato Qaror",
+        typeClass: "danger",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "Qayta urinib ko'rish", icon: "fa-undo", next: 0 }],
+      },
+      17: {
+        title: "Qariya Jodugar",
+        text: "Eshikni taqillatdingiz. Bir daqiqadan so'ng qadimiy kampir ochdi. U do'stona tabassum qildi: 'Men sizni kutayotgan edim, yo'lovchi. Kiring, ovqat tayyor.' U sizga yo'l ko'rsatdi va ertalab xavfsiz shaharga yetkazdi.",
+        img: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&q=80",
+        type: "🏆 G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Qayta o'ynash", icon: "fa-redo", next: 0 }],
+        win: true,
+        xp: 40
+      },
+      18: {
+        title: "Bo'sh Uy",
+        text: "Ichkariga kirsangiz, hech kim yo'q. Faqat yonayotgan sham va ovqat qoldiqlari. Go'yo kimdir tezda chiqib ketgan. Devorga qo'rqinchli nishonlar chizilgan...",
+        img: "https://images.unsplash.com/photo-1509557965875-b88c97052f0e?w=600&q=80",
+        type: "👻 Qo'rqinch",
+        chapter: 4,
+        progress: 55,
+        choices: [
+          { text: "Tezda chiqib ketish", icon: "fa-running", next: 12 },
+          { text: "Uyni tekshirishni davom ettirish", icon: "fa-search", next: 23 }
+        ]
+      },
+      19: {
+        title: "Kuzatish",
+        text: "Derazadan qarasangiz, ichkarida keksa ayol o'tiribdi va kitob o'qiyapti. U xavfsiz ko'rinadi. Lekin uning orqasida qorong'u soya harakatlanmoqda...",
+        img: "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&q=80",
+        type: "👀 Kuzatish",
+        chapter: 4,
+        progress: 50,
+        choices: [
+          { text: "Eshikni taqillatish va ogohlantirish", icon: "fa-door-open", next: 17 },
+          { text: "Jimgina chiqib ketish", icon: "fa-running", next: 12 }
+        ]
+      },
+      20: {
+        title: "Xavfsiz Tun",
+        text: "Kulbada issiq va xavfsiz tun o'tkazdingiz. Ertalab yangi kuch bilan shimolga yo'l oldingiz. Kompas yordamida shaharga yetib oldingiz!",
+        img: "https://images.unsplash.com/photo-1465919292275-c60ba49da6ae?w=600&q=80",
+        type: "🏆 G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Qayta o'ynash", icon: "fa-redo", next: 0 }],
+        win: true,
+        xp: 50
+      },
+      21: {
+        title: "Yashirin Sandiq",
+        text: "Kulbani tekshirsangiz, pol tagida yashirin sandiq topdingiz. Ichida oltin tangalar va qimmatbaho toshlar! Siz ularni olib, shaharga yo'l oldingiz. Endi siz boy odamsiz!",
+        img: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=600&q=80",
+        type: "🏆 Buyuk G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Qayta o'ynash", icon: "fa-redo", next: 0 }],
+        win: true,
+        xp: 75
+      },
+      22: {
+        title: "Xazina!",
+        text: "Ehtiyotkorlik bilan porloq narsani oldingiz — bu qadimiy oltin medal ekan! Ayiq uyg'onmadi. Siz tezda chiqib ketdingiz va ertalab shaharga yetib oldingiz. Muzeydagi mutaxassislar bu medalning millionlab dollar turarkligini aytishdi!",
+        img: "https://images.unsplash.com/photo-1543536448-d209d2d13a1c?w=600&q=80",
+        type: "🏆 Katta G'alaba",
+        typeClass: "win",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "🎉 Qayta o'ynash", icon: "fa-redo", next: 0 }],
+        win: true,
+        xp: 100
+      },
+      23: {
+        title: "Qorong'u Sir",
+        text: "Uyni tekshirsangiz, yerto'la eshigini topdingiz. Lekin qandaydir qorong'u kuch sizni tortib ketdi... Siz endi o'sha uyning qurbonlari qatoriga qo'shildingiz.",
+        img: "https://images.unsplash.com/photo-1509248961189-91c797d09e94?w=600&q=80",
+        type: "💀 Qorong'u Yakun",
+        typeClass: "danger",
+        chapter: "Yakuniy",
+        progress: 100,
+        choices: [{ text: "Qayta urinib ko'rish", icon: "fa-undo", next: 0 }],
+      }
+    };
+
+    let visitedNodes = new Set();
+
+    function makeChoice(nodeId) {
+      const data = storyNodes[nodeId];
+      if (!data) return;
+
+      // Track visited nodes
+      visitedNodes.add(nodeId);
+
+      // Update progress bar
+      const progressBar = document.getElementById('story-progress');
+      if (progressBar) {
+        progressBar.style.width = data.progress + '%';
+      }
+
+      // Update UI with animation
+      const titleEl = document.getElementById("story-title");
+      const textEl = document.getElementById("story-text");
+      const imgEl = document.getElementById("story-img");
+
+      // Reset animation
+      textEl.style.animation = 'none';
+      textEl.offsetHeight; // Trigger reflow
+      textEl.style.animation = 'fadeInText 0.5s forwards';
+
+      titleEl.innerText = data.title;
+      textEl.innerText = data.text;
+      imgEl.style.backgroundImage = `url('${data.img}')`;
+
+      // Update badges
+      const typeBadge = document.getElementById("scene-type");
+      typeBadge.innerText = data.type || "Sarguzasht";
+      typeBadge.className = 'badge' + (data.typeClass ? ' ' + data.typeClass : '');
+
+      const chapterBadge = document.getElementById("scene-chapter");
+      chapterBadge.innerText = typeof data.chapter === 'number' ? `Qism ${data.chapter}` : data.chapter;
+
+      // Render choices with animation
+      const btnContainer = document.getElementById("choices");
+      btnContainer.innerHTML = "";
+
+      data.choices.forEach((choice, index) => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.innerHTML = `<i class="fas ${choice.icon || 'fa-arrow-right'}"></i> ${choice.text}`;
+        btn.style.animationDelay = `${index * 0.1}s`;
+        btn.onclick = () => {
+          if (navigator.vibrate) navigator.vibrate(10);
+          makeChoice(choice.next);
+        };
+        btnContainer.appendChild(btn);
+      });
+
+      // Award XP for winning
+      if (data.win) {
+        const reward = data.xp || 20;
+        if (window.addXP) addXP(reward);
+
+        // Reset visited nodes on win
+        visitedNodes.clear();
+      }
+    }
+
+    // Initialize
+    makeChoice(0);
+  </script>
+</body>
+
+</html>

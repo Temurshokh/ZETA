@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZETA | To-Do</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2><a href="../tools.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i>
+          ZETA</a></h2>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main style="max-width: 500px">
+    <section class="glass-panel">
+      <h3 style="margin-bottom: 1rem;">📝 To-Do List</h3>
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem">
+        <input type="text" id="todo-input" placeholder="Vazifa qo'shish..."
+          style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.9rem;" />
+        <button onclick="addTodo()" class="btn btn-sm">Qo'shish</button>
+      </div>
+      <ul id="todo-list" style="list-style: none; max-height: 350px; overflow-y: auto; padding: 0;"></ul>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "zeta_todos";
+
+    function loadTodos() {
+      const list = document.getElementById("todo-list");
+      list.innerHTML = "";
+      const todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      todos.forEach((todo) => createTodoElement(todo.text));
+    }
+
+    function saveTodos() {
+      const list = document.getElementById("todo-list");
+      const todos = [];
+      list.querySelectorAll("li span").forEach((span) => {
+        todos.push({ text: span.textContent });
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    }
+
+    function createTodoElement(text) {
+      const list = document.getElementById("todo-list");
+      const li = document.createElement("li");
+      li.style.cssText = "background: rgba(255,255,255,0.05); margin-bottom: 0.5rem; padding: 0.75rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);";
+      li.innerHTML = `<span style="flex:1; font-size: 0.9rem;">${text}</span><button onclick="finishTodo(this)" style="background:none; border:none; color:var(--success); cursor:pointer; font-size: 1.1rem;">✔</button>`;
+      list.appendChild(li);
+    }
+
+    function addTodo() {
+      const input = document.getElementById("todo-input");
+      const text = input.value.trim();
+      if (text) {
+        createTodoElement(text);
+        saveTodos();
+        input.value = "";
+      }
+    }
+
+    function finishTodo(btn) {
+      btn.parentElement.remove();
+      saveTodos();
+      if (window.addXP) addXP(5);
+    }
+
+    document.getElementById("todo-input").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") addTodo();
+    });
+
+    loadTodos();
+  </script>
+</body>
+
+</html>

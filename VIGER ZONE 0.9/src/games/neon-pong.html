@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Neon Pong | VIGER ZONE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body class="game-page">
+  <header>
+    <div class="logo">
+      <h2>
+        <a href="../games.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i> VIGER
+          ZONE</a>
+      </h2>
+    </div>
+    <div id="xp-display"></div>
+  </header>
+
+  <main class="text-center" style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80dvh;
+      ">
+    <h2>Neon Pong</h2>
+    <div style="margin-bottom: 1rem">Ochko: <span id="score">0</span></div>
+    <canvas id="pong" width="600" height="400" style="
+          border: 2px solid var(--primary-accent);
+          border-radius: 12px;
+          background: rgba(0, 0, 0, 0.5);
+          max-width: 100%;
+        "></canvas>
+    <p class="mt-4" style="color: var(--text-muted)">
+      <i class="fas fa-mouse"></i> Sichqoncha yoki Barmog'ingiz bilan
+      boshqaring
+    </p>
+    <p style="font-size: 0.8rem; color: var(--text-muted)">
+      Mobil: Ekranni bosing va suring
+    </p>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("pong");
+    const ctx = canvas.getContext("2d");
+
+    // Resize for mobile
+    function resizeLayout() {
+      const containerWidth = window.innerWidth - 30;
+      if (window.innerWidth < 620) {
+        canvas.width = containerWidth;
+        canvas.height = Math.min(300, containerWidth * 0.75); // Keep aspect ratio
+      } else {
+        canvas.width = 600;
+        canvas.height = 400;
+      }
+    }
+    window.addEventListener("resize", resizeLayout);
+    resizeLayout();
+
+    // Game objects
+    const ball = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: 10,
+      velocityX: 5,
+      velocityY: 5,
+      speed: 7,
+      color: "#10b981",
+    };
+    const user = {
+      x: 0,
+      y: (canvas.height - 100) / 2,
+      width: 10,
+      height: 100,
+      score: 0,
+      color: "#3b82f6",
+    };
+    const com = {
+      x: canvas.width - 10,
+      y: (canvas.height - 100) / 2,
+      width: 10,
+      height: 100,
+      score: 0,
+      color: "#ef4444",
+    };
+    const net = {
+      x: (canvas.width - 2) / 2,
+      y: 0,
+      height: 10,
+      width: 2,
+      color: "rgba(255,255,255,0.2)",
+    };
+
+    function drawRect(x, y, w, h, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, w, h);
+    }
+
+    function drawArc(x, y, r, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawNet() {
+      for (let i = 0; i <= canvas.height; i += 15) {
+        drawRect(net.x, net.y + i, net.width, net.height, net.color);
+      }
+    }
+
+    function drawText(text, x, y) {
+      ctx.fillStyle = "#FFF";
+      ctx.font = "45px 'Inter'";
+      ctx.fillText(text, x, y);
+    }
+
+    canvas.addEventListener("mousemove", getMousePos);
+    canvas.addEventListener("touchmove", getTouchPos);
+
+    function getMousePos(evt) {
+      let rect = canvas.getBoundingClientRect();
+      user.y = evt.clientY - rect.top - user.height / 2;
+      // Bound check
+      if (user.y < 0) user.y = 0;
+      if (user.y + user.height > canvas.height)
+        user.y = canvas.height - user.height;
+    }
+
+    function getTouchPos(evt) {
+      evt.preventDefault();
+      let rect = canvas.getBoundingClientRect();
+      user.y = evt.touches[0].clientY - rect.top - user.height / 2;
+      if (user.y < 0) user.y = 0;
+      if (user.y + user.height > canvas.height)
+        user.y = canvas.height - user.height;
+    }
+
+    function resetBall() {
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      ball.velocityX = -ball.velocityX; // Send to winner? No, just flip
+      ball.speed = 7;
+    }
+
+    function collision(b, p) {
+      p.top = p.y;
+      p.bottom = p.y + p.height;
+      p.left = p.x;
+      p.right = p.x + p.width;
+
+      b.top = b.y - b.radius;
+      b.bottom = b.y + b.radius;
+      b.left = b.x - b.radius;
+      b.right = b.x + b.radius;
+
+      return (
+        p.left < b.right &&
+        p.top < b.bottom &&
+        p.right > b.left &&
+        p.bottom > b.top
+      );
+    }
+
+    function update() {
+      if (gameStopped) return;
+
+      ball.x += ball.velocityX;
+      ball.y += ball.velocityY;
+
+      // Simple AI
+      com.y += (ball.y - (com.y + com.height / 2)) * 0.1;
+      // AI Bound check
+      if (com.y < 0) com.y = 0;
+      if (com.y + com.height > canvas.height)
+        com.y = canvas.height - com.height;
+
+      if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+        ball.velocityY = -ball.velocityY;
+      }
+
+      let player = ball.x + ball.radius < canvas.width / 2 ? user : com;
+
+      if (collision(ball, player)) {
+        let collidePoint = ball.y - (player.y + player.height / 2);
+        collidePoint = collidePoint / (player.height / 2);
+        let angleRad = (Math.PI / 4) * collidePoint;
+        let direction = ball.x + ball.radius < canvas.width / 2 ? 1 : -1;
+        ball.velocityX = direction * ball.speed * Math.cos(angleRad);
+        ball.velocityY = ball.speed * Math.sin(angleRad);
+        ball.speed += 0.1;
+      }
+
+      // Score update
+      if (ball.x - ball.radius < 0) {
+        com.score++;
+        resetBall();
+      } else if (ball.x + ball.radius > canvas.width) {
+        user.score++;
+        if (window.addXP) addXP(5); // XP Reward
+        document.getElementById("score").innerText = user.score;
+        resetBall();
+      }
+    }
+
+    // Fixed user position for this logic
+    user.x = 0;
+
+    // Com is right
+    function updateComPos() {
+      com.x = canvas.width - 10;
+    }
+
+    let gameStopped = false;
+
+    function render() {
+      updateComPos();
+      drawRect(0, 0, canvas.width, canvas.height, "rgba(0,0,0,0.1)"); // Trail effect
+      drawNet();
+      drawText(user.score, canvas.width / 4, canvas.height / 5);
+      drawText(com.score, (3 * canvas.width) / 4, canvas.height / 5);
+      drawRect(user.x, user.y, user.width, user.height, user.color);
+      drawRect(com.x, com.y, com.width, com.height, com.color);
+      drawArc(ball.x, ball.y, ball.radius, ball.color);
+    }
+
+    function game() {
+      update();
+      render();
+      requestAnimationFrame(game);
+    }
+    game();
+  </script>
+</body>
+
+</html>

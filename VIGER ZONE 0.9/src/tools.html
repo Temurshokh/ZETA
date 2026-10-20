@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#00e5ff" />
+  <title>ZETA | Vositalar</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="js/core/state.js" defer></script>
+  <script src="js/core/telegram.js" defer></script>
+  <script src="js/xp.js" defer></script>
+  <script src="js/lang.js" defer></script>
+  <script src="js/main.js"></script>
+  <style>
+    /* Specific tweaks for tool icons */
+    .tool-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tool-card {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .tool-card {
+        padding: 0.85rem !important;
+      }
+
+      .tool-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .tool-card h3 {
+        font-size: 0.85rem;
+        margin-bottom: 0.15rem;
+      }
+
+      .tool-card p {
+        font-size: 0.7rem;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .tool-card .btn {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.7rem;
+        margin-top: 0.4rem !important;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .tool-icon {
+        font-size: 1.5rem;
+      }
+
+      .tool-card h3 {
+        font-size: 0.75rem;
+      }
+
+      .tool-card p {
+        display: none;
+      }
+    }
+  </style>
+  <script src="js/core/music.js" defer></script>
+  <script src="js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2>ZETA</h2>
+
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main>
+    <section class="grid-2">
+      <!-- Crypto Calc -->
+      <a href="tools/crypto-calc.html" class="glass-panel tool-card">
+        <div class="tool-icon">💱</div>
+        <h3>Kripto Kalkulyator</h3>
+        <p>Valuta hisoblash</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- To-Do -->
+      <a href="tools/todo.html" class="glass-panel tool-card">
+        <div class="tool-icon">📝</div>
+        <h3>To-Do</h3>
+        <p>Vazifalar ro'yxati</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- Harajatlar -->
+      <a href="tools/expenses.html" class="glass-panel tool-card" style="border-color: hsla(150, 80%, 40%, 0.3);">
+        <div class="tool-icon">💸</div>
+        <h3>Harajatlar</h3>
+        <p>Moliya nazorati</p>
+        <span class="btn btn-glass mt-3" style="border-color: hsla(150, 80%, 40%, 0.5); color: #4ade80;">Ochish</span>
+      </a>
+
+      <!-- Qaror -->
+      <a href="tools/decision.html" class="glass-panel tool-card" style="border-color: hsla(200, 80%, 50%, 0.3);">
+        <div class="tool-icon">⚖️</div>
+        <h3>Qaror</h3>
+        <p>Aqlli tanlov</p>
+        <span class="btn btn-glass mt-3" style="border-color: hsla(200, 80%, 50%, 0.5); color: #60a5fa;">Ochish</span>
+      </a>
+
+      <!-- Calculator -->
+      <a href="tools/calculator.html" class="glass-panel tool-card">
+        <div class="tool-icon">🧮</div>
+        <h3>Kalkulyator</h3>
+        <p>Hisob-kitob</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- Color Picker -->
+      <a href="tools/color-picker.html" class="glass-panel tool-card">
+        <div class="tool-icon">🎨</div>
+        <h3>Rang Tanlash</h3>
+        <p>HEX va RGB</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- Stopwatch -->
+      <a href="tools/stopwatch.html" class="glass-panel tool-card">
+        <div class="tool-icon">⏱</div>
+        <h3>Sekundomer</h3>
+        <p>Vaqtni o'lchash</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- QR Generator -->
+      <a href="tools/qr-generator.html" class="glass-panel tool-card">
+        <div class="tool-icon">📱</div>
+        <h3>QR Kod</h3>
+        <p>QR yaratish</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- Password Generator -->
+      <a href="tools/password-generator.html" class="glass-panel tool-card">
+        <div class="tool-icon">🔐</div>
+        <h3>Parol</h3>
+        <p>Xavfsiz parollar</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- Daily Routine -->
+      <a href="tools/daily-routine.html" class="glass-panel tool-card" style="border-color: hsla(280, 80%, 60%, 0.3);">
+        <div class="tool-icon">🔥</div>
+        <h3>Daily Routine</h3>
+        <p>7 kunlik intizom</p>
+        <span class="btn btn-glass mt-3" style="border-color: hsla(280, 80%, 60%, 0.5); color: #c084fc;">Ochish</span>
+      </a>
+
+      <!-- Unit Converter -->
+      <a href="tools/unit-converter.html" class="glass-panel tool-card">
+        <div class="tool-icon">📐</div>
+        <h3>O'lchov</h3>
+        <p>Birlik o'girish</p>
+        <span class="btn btn-glass mt-3">Ochish</span>
+      </a>
+
+      <!-- Eslatma (Notes) -->
+      <a href="tools/notes.html" class="glass-panel tool-card" style="border-color: hsla(180, 80%, 50%, 0.3);">
+        <div class="tool-icon">📝</div>
+        <h3>Eslatma</h3>
+        <p>Tezkor yozuvlar</p>
+        <span class="btn btn-glass mt-3" style="border-color: hsla(180, 80%, 50%, 0.5); color: #00e5ff;">Ochish</span>
+      </a>
+    </section>
+  </main>
+  <nav class="tab-bar"></nav>
+</body>
+
+</html>

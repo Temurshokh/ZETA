@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIGER ZONE | Crossy Road 3D</title>
+  <link rel="stylesheet" href="css/crossy-road.css" />
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" />
+  <script src="js/core/music.js" defer></script>
+  <script src="js/core/navigation.js" defer></script>
+</head>
+
+<body class="game-page">
+  <a href="games.html" id="back-btn" style="
+        color: white;
+        font-family: &quot;Inter&quot;, sans-serif;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 8px 16px;
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+      ">← Orqaga</a>
+
+  <canvas class="game"></canvas>
+
+  <div id="controls">
+    <div>
+      <button id="forward">▲</button>
+      <button id="left">◀</button>
+      <button id="backward">▼</button>
+      <button id="right">▶</button>
+    </div>
+  </div>
+
+  <div id="score">0</div>
+
+  <div id="result-container">
+    <div id="result">
+      <h1>O'yin Tugadi</h1>
+      <p>Sizning natijangiz: <span id="final-score"></span></p>
+      <button id="retry">Qayta o'ynash</button>
+      <a href="games.html" style="
+            margin-top: 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-family: &quot;Inter&quot;, sans-serif;
+          ">O'yinlardan chiqish</a>
+    </div>
+  </div>
+
+  <script src="js/xp.js"></script>
+  <script type="module" src="js/crossy-road.js"></script>
+</body>
+
+</html>

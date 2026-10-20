@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ZETA — Daily Routine</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/xp.js" defer></script>
+    <script src="../js/lang.js" defer></script>
+    <script src="../js/main.js" defer></script>
+    <style>
+        .setup-screen,
+        .routine-screen {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .day-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .day-dot {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-dot.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .day-dot.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .task-item.done {
+            opacity: 0.6;
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-time {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
+            min-width: 45px;
+        }
+
+        .task-text {
+            font-size: 0.9rem;
+            flex: 1;
+        }
+    </style>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="../tools.html" style="text-decoration: none; color: inherit">
+                <h2><i class="fas fa-arrow-left"></i> Daily Routine</h2>
+            </a>
+        </div>
+    </header>
+
+    <main style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="setup-screen glass-panel" style="margin-top: 5vh; text-align: center;">
+            <h3 style="margin-bottom: 1.5rem;">Intizomingizni boshlaymiz! 🔥</h3>
+
+            <div style="text-align: left; margin-bottom: 1.5rem;">
+                <label style="font-size: 0.85rem; color: var(--text-muted);">Siz o'qiysizmi?</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <button class="btn btn-glass" onclick="setStudy(true)" id="study-yes" style="flex:1;">Ha</button>
+                    <button class="btn btn-glass" onclick="setStudy(false)" id="study-no" style="flex:1;">Yo'q</button>
+                </div>
+            </div>
+
+            <div id="time-question" style="text-align: left; margin-bottom: 2rem; display: none;">
+                <label style="font-size: 0.85rem; color: var(--text-muted);">Darslar qachon?</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <button class="btn btn-glass" onclick="setShift('morning')" style="flex:1;">Ertalab</button>
+                    <button class="btn btn-glass" onclick="setShift('evening')" style="flex:1;">Kechki</button>
+                </div>
+            </div>
+
+            <button id="start-btn" class="btn btn-primary" style="width: 100%; display: none;"
+                onclick="finishSetup()">Boshlash</button>
+        </div>
+
+        <!-- Main Routine Screen -->
+        <div id="routine-screen" class="routine-screen">
+            <div class="day-selector">
+                <div class="day-dot" data-day="0">DU</div>
+                <div class="day-dot" data-day="1">SE</div>
+                <div class="day-dot" data-day="2">CH</div>
+                <div class="day-dot" data-day="3">PA</div>
+                <div class="day-dot" data-day="4">JU</div>
+                <div class="day-dot" data-day="5">SH</div>
+                <div class="day-dot" data-day="6">YA</div>
+            </div>
+
+            <div class="glass-panel" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                    <h4 id="today-name" style="margin: 0;">Dushanba</h4>
+                    <div id="progress-text" style="font-size: 0.75rem; font-weight: 700; color: var(--primary);">0/6
+                    </div>
+                </div>
+                <div
+                    style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 1.5rem; overflow: hidden;">
+                    <div id="progress-bar"
+                        style="width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease;"></div>
+                </div>
+
+                <div id="tasks-container">
+                    <!-- Tasks injected here -->
+                </div>
+
+                <div id="reward-section"
+                    style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; text-align: center;">
+                    <div style="font-size: 1.2rem; margin-bottom: 5px;">🎉 Ajoyib!</div>
+                    <div style="font-size: 0.85rem; color: var(--success);">Bugungi barcha vazifalar bajarildi! +50 XP
+                        olindi.</div>
+                </div>
+            </div>
+
+            <button class="btn btn-glass btn-sm" style="width: 100%; opacity: 0.5;"
+                onclick="resetRoutine()">Sozlamalarni qayta o'rnatish</button>
+        </div>
+    </main>
+
+    <script>
+        let setup = JSON.parse(localStorage.getItem('zeta_routine_setup') || 'null');
+        let routineState = JSON.parse(localStorage.getItem('zeta_routine_state') || '{}');
+        let isStudent = false;
+        let shift = 'morning';
+
+        const dayNames = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"];
+        const shortDays = ["DU", "SE", "CH", "PA", "JU", "SH", "YA"];
+
+        const routines = {
+            student_morning: [
+                { t: "06:00", d: "Turish & Suv ichish" },
+                { t: "06:15", d: "Badantarbiya (10 min)" },
+                { t: "07:00", d: "Darsga tayyorgarlik" },
+                { t: "08:00", d: "Maktab/Universitet" },
+                { t: "14:00", d: "Kitob o'qish (15 bet)" },
+                { t: "22:00", d: "Uyquga yotish" }
+            ],
+            student_evening: [
+                { t: "08:00", d: "Turish & Nonushta" },
+                { t: "09:00", d: "Kitob o'qish (15 bet)" },
+                { t: "10:00", d: "Vazifalarni bajarish" },
+                { t: "13:00", d: "Darsga ketish" },
+                { t: "19:00", d: "Sport/Yugurish" },
+                { t: "23:00", d: "Uyquga yotish" }
+            ],
+            work: [
+                { t: "07:00", d: "Ertalabki reja" },
+                { t: "08:30", d: "Ish boshlash" },
+                { t: "13:00", d: "Piyoda yurish" },
+                { t: "18:00", d: "Oila bilan vaqt" },
+                { t: "20:00", d: "O'z ustida ishlash" },
+                { t: "22:30", d: "Uyqu" }
+            ],
+            weekend: [
+                { t: "08:30", d: "Dam olish (Kechiroq turish)" },
+                { t: "10:00", d: "Tozalik/Tartib" },
+                { t: "12:00", d: "Yaqinlar bilan bog'lanish" },
+                { t: "15:00", d: "Haftalik tahlil" },
+                { t: "18:00", d: "O'yin yoki Kino" },
+                { t: "22:00", d: "Ertangi kunga reja" }
+            ]
+        };
+
+        function setStudy(val) {
+            isStudent = val;
+            document.getElementById('study-yes').classList.toggle('btn-primary', val);
+            document.getElementById('study-no').classList.toggle('btn-primary', !val);
+            document.getElementById('time-question').style.display = val ? 'block' : 'none';
+            document.getElementById('start-btn').style.display = val ? 'none' : 'block';
+        }
+
+        function setShift(val) {
+            shift = val;
+            finishSetup();
+        }
+
+        function finishSetup() {
+            setup = { isStudent, shift };
+            localStorage.setItem('zeta_routine_setup', JSON.stringify(setup));
+            init();
+        }
+
+        function resetRoutine() {
+            if (confirm("Barcha intizom ma'lumotlarini o'chirib yuborasizmi?")) {
+                localStorage.removeItem('zeta_routine_setup');
+                localStorage.removeItem('zeta_routine_state');
+                location.reload();
+            }
+        }
+
+        function getTodayIndex() {
+            let day = new Date().getDay(); // 0 is Sunday
+            return day === 0 ? 6 : day - 1; // Convert to 0=Mon, 6=Sun
+        }
+
+        function init() {
+            if (!setup) {
+                document.getElementById('setup-screen').style.display = 'block';
+                document.getElementById('routine-screen').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('routine-screen').style.display = 'block';
+
+            const todayIdx = getTodayIndex();
+            renderRoutine(todayIdx);
+            updateDots();
+        }
+
+        function renderRoutine(dayIdx) {
+            const todayIdx = getTodayIndex();
+            const container = document.getElementById('tasks-container');
+            document.getElementById('today-name').textContent = dayNames[dayIdx] + (dayIdx === todayIdx ? " (Bugun)" : "");
+
+            // Pick routine
+            let taskList = routines.work;
+            if (dayIdx >= 5) { // Weekend
+                taskList = routines.weekend;
+            } else if (setup.isStudent) {
+                taskList = routines[setup.isStudent ? `student_${setup.shift}` : 'work'];
+            }
+
+            const dateKey = new Date().toISOString().split('T')[0];
+            if (dayIdx !== todayIdx) {
+                // View only mode for other days
+                container.innerHTML = taskList.map(t => `
+                <div class="task-item">
+                    <div class="task-time">${t.t}</div>
+                    <div class="task-text">${t.d}</div>
+                </div>
+            `).join('');
+                document.getElementById('progress-bar').style.width = '0%';
+                document.getElementById('progress-text').textContent = '-/-';
+                return;
+            }
+
+            const completed = routineState[dateKey] || [];
+            container.innerHTML = taskList.map((t, idx) => `
+            <div class="task-item ${completed.includes(idx) ? 'done' : ''}" onclick="toggleTask(${idx})">
+                <div class="task-time">${t.t}</div>
+                <div class="task-text">${t.d}</div>
+                <input type="checkbox" class="task-checkbox" ${completed.includes(idx) ? 'checked' : ''} readonly>
+            </div>
+        `).join('');
+
+            const prog = (completed.length / taskList.length) * 100;
+            document.getElementById('progress-bar').style.width = `${prog}%`;
+            document.getElementById('progress-text').textContent = `${completed.length}/${taskList.length}`;
+
+            if (completed.length === taskList.length && taskList.length > 0) {
+                document.getElementById('reward-section').style.display = 'block';
+                awardDailyXP();
+            } else {
+                document.getElementById('reward-section').style.display = 'none';
+            }
+        }
+
+        function toggleTask(idx) {
+            const dateKey = new Date().toISOString().split('T')[0];
+            if (!routineState[dateKey]) routineState[dateKey] = [];
+
+            const list = routineState[dateKey];
+            if (list.includes(idx)) {
+                routineState[dateKey] = list.filter(i => i !== idx);
+            } else {
+                routineState[dateKey].push(idx);
+            }
+
+            localStorage.setItem('zeta_routine_state', JSON.stringify(routineState));
+            renderRoutine(getTodayIndex());
+            updateDots();
+        }
+
+        function awardDailyXP() {
+            const dateKey = new Date().toISOString().split('T')[0];
+            const claimedKey = `zeta_routine_xp_${dateKey}`;
+            if (localStorage.getItem(claimedKey)) return;
+
+            if (window.addXP) {
+                window.addXP(50);
+                localStorage.setItem(claimedKey, 'true');
+                if (window.showNotification) showNotification("Intizom uchun +50 XP! 🔥", "success");
+            }
+        }
+
+        function updateDots() {
+            const todayIdx = getTodayIndex();
+            const dots = document.querySelectorAll('.day-dot');
+            const dateObj = new Date();
+
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === todayIdx);
+
+                // Check if day was completed
+                // This is simple: just check if that day's state exists and is full
+                // But since we only have current and maybe past, it's fine
+                dot.onclick = () => renderRoutine(idx);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+    <nav class="tab-bar"></nav>
+</body>
+
+</html>

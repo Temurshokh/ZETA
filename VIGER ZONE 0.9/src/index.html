@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description"
+    content="ZETA — Eng zo'r web o'yinlar va vositalar to'plami. Kripto market, o'yinlar va foydali vositalar." />
+  <meta name="theme-color" content="#00e5ff" />
+  <title>ZETA</title>
+
+  <!-- Branding -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Core Modules (v0.7) -->
+  <script src="js/core/state.js" defer></script>
+  <script src="js/core/telegram.js" defer></script>
+
+  <!-- App Scripts -->
+  <script src="js/xp.js" defer></script>
+  <script src="js/lang.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/crypto.js" defer></script>
+  <script src="js/achievements.js" defer></script>
+
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] SW registered:', reg.scope))
+          .catch(err => console.warn('[PWA] SW registration failed:', err));
+      });
+    }
+  </script>
+  <style>
+    /* Home page specific mobile optimizations */
+    @media (max-width: 480px) {
+      .hero {
+        padding: 1rem !important;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .hero p {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .hero-buttons .btn {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+      }
+    }
+
+    @media (max-width: 320px) {
+      .hero h1 {
+        font-size: 1.3rem;
+      }
+
+      .hero p {
+        font-size: 0.75rem;
+      }
+
+      .hero-buttons .btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+
+    /* Modal safety — never overflow screen */
+    .modal-content {
+      max-height: calc(100dvh - 2rem);
+      max-width: calc(100vw - 1.5rem);
+    }
+  </style>
+  <script src="js/core/music.js" defer></script>
+  <script src="js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2 data-trn="hero-title">ZETA</h2>
+      <span class="brand-label">by VIGER</span>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero glass-panel">
+      <div class="hero-content">
+        <h1 data-trn="hero-title">ZETA</h1>
+        <p data-trn="hero-subtitle">
+          Eng zo'r web o'yinlar va vositalar to'plami
+        </p>
+        <div class="hero-buttons">
+          <a href="games.html" class="btn btn-primary" data-trn="btn-explore">
+            <i class="fas fa-rocket"></i> O'yinlarni Ko'rish
+          </a>
+          <a href="changelog.html" class="btn btn-glass" style="position: relative;">
+            🔔 <span data-trn="cl-btn-news">Yangiliklar</span>
+            <span class="notification-dot"></span>
+          </a>
+        </div>
+      </div>
+      <!-- Daily Tip Section -->
+      <div id="daily-tip-container" class="tip-card" style="display: none;">
+        <div class="tip-icon">💡</div>
+        <div class="tip-content">
+          <div class="tip-title" data-trn="tip-title">Kun Maslahati</div>
+          <div id="daily-tip-text" class="tip-text">...</div>
+        </div>
+        <button onclick="dismissTip()" class="tip-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="hero-bg-effect"></div>
+    </section>
+
+
+    <!-- Live Crypto Market -->
+    <section class="crypto-section">
+      <div class="crypto-header">
+        <h3><i class="fas fa-chart-line"></i> Kripto Bozor</h3>
+        <div class="crypto-controls">
+          <input type="text" id="crypto-search" class="search-input" placeholder="Qidirish..." />
+        </div>
+      </div>
+
+      <!-- Top Gainers / Losers -->
+      <div id="gainers-losers" style="margin-bottom: 1rem;"></div>
+
+      <!-- Portfolio Tracker -->
+      <div id="portfolio-container" style="display: none;"></div>
+
+
+      <div id="crypto-container" class="grid-3">
+        <!-- Skeleton loaders -->
+        <div class="skeleton-loader"></div>
+        <div class="skeleton-loader"></div>
+        <div class="skeleton-loader"></div>
+        <div class="skeleton-loader"></div>
+        <div class="skeleton-loader"></div>
+        <div class="skeleton-loader"></div>
+      </div>
+
+      <!-- View All Button -->
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <button id="view-all-coins" class="btn btn-glass btn-sm">
+          <i class="fas fa-list"></i> <span data-trn="btn-view-all">Barchasini ko'rish</span>
+        </button>
+      </div>
+
+      <!-- Full Crypto List Modal -->
+      <div id="all-coins-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-panel">
+          <div class="modal-header">
+            <h3 data-trn="crypto-list-title">Barcha Kriptovalyutalar</h3>
+            <button class="close-modal btn btn-glass btn-sm"><i class="fas fa-times"></i></button>
+          </div>
+          <div id="all-coins-container" class="all-coins-grid">
+            <!-- Full list injected here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Market Details Panel -->
+      <div id="market-details" class="market-details-panel" style="display: none;">
+        <div class="market-details-header">
+          <h4 id="detail-name">Bitcoin — BTC</h4>
+        </div>
+        <div class="market-details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Narx</span>
+            <span id="detail-price" class="detail-value price">$0.00</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">24s O'zgarish</span>
+            <span id="detail-change" class="detail-value">0.00%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">24s Yuqori</span>
+            <span id="detail-high" class="detail-value">$0.00</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">24s Past</span>
+            <span id="detail-low" class="detail-value">$0.00</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">24s Hajm</span>
+            <span id="detail-volume" class="detail-value">0</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Yangilangan</span>
+            <span id="detail-updated" class="detail-value">--:--:--</span>
+          </div>
+        </div>
+        <div class="market-details-actions">
+          <button class="btn btn-glass" onclick="openChartModal(selectedCoin?.symbol)">
+            <i class="fas fa-chart-line"></i> Grafik
+          </button>
+          <button class="btn btn-glass"
+            onclick="copyPrice(parseFloat(document.getElementById('detail-price').textContent.replace('$', '').replace(/,/g, '')))">
+            <i class="fas fa-copy"></i> Nusxalash
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <a href="tools/crypto-calc.html" class="btn btn-glass btn-sm">Kripto Kalkulyator &rarr;</a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tab-bar"></nav>
+</body>
+
+</html>

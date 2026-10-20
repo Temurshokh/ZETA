@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZETA | Sekundomer</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2><a href="../tools.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i>
+          ZETA</a></h2>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main style="max-width: 400px">
+    <section class="glass-panel text-center">
+      <h3>⏱ Sekundomer</h3>
+      <div id="sw-display" style="font-size: 3rem; font-family: monospace; margin: 1.5rem 0; font-weight: bold;">
+        00:00:00</div>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <button onclick="startStopwatch()" class="btn"
+          style="background: var(--success); color: white; min-width: 80px">Start</button>
+        <button onclick="stopStopwatch()" class="btn"
+          style="background: var(--danger); color: white; min-width: 80px">Stop</button>
+        <button onclick="resetStopwatch()" class="btn btn-glass" style="min-width: 80px">Reset</button>
+      </div>
+    </section>
+  </main>
+  <script>
+    let swInterval;
+    let swSeconds = 0;
+    function startStopwatch() {
+      if (swInterval) return;
+      swInterval = setInterval(() => {
+        swSeconds++;
+        const date = new Date(0);
+        date.setSeconds(swSeconds);
+        document.getElementById("sw-display").textContent = date.toISOString().substr(11, 8);
+      }, 1000);
+    }
+    function stopStopwatch() {
+      clearInterval(swInterval);
+      swInterval = null;
+      if (window.addXP && swSeconds > 10) addXP(1);
+    }
+    function resetStopwatch() {
+      stopStopwatch();
+      swSeconds = 0;
+      document.getElementById("sw-display").textContent = "00:00:00";
+    }
+  </script>
+</body>
+
+</html>

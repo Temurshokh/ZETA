@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Mini City 3D - Ultimate</title>
+  <!-- Dependencies -->
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.150.1/build/three.module.js"
+        }
+      }
+    </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/game-ui.js" defer></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: "Segoe UI", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #canvas-container {
+      width: 100%;
+      height: 100dvh;
+    }
+
+    /* GUI Overlay - Responsive Fixes */
+    #gui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100dvh;
+      /* Dynamic Viewport Height for Mobile */
+      pointer-events: none;
+      touch-action: none;
+      /* Prevent browser gestures */
+      z-index: 10;
+    }
+
+    /* HUD */
+    .hud-panel {
+      position: absolute;
+      pointer-events: auto;
+    }
+
+    #stats-bar {
+      top: 15px;
+      left: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 60%;
+    }
+
+    .stat-box {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 6px 12px;
+      border-radius: 16px;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    #health-container {
+      width: 150px;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    #hp-bar {
+      width: 100%;
+      height: 100%;
+      background: #22c55e;
+      transition:
+        width 0.2s,
+        background 0.3s;
+    }
+
+    /* Weapon Selector - Move up to avoid bottom gesture bar */
+    #weapon-selector {
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 15px;
+      backdrop-filter: blur(5px);
+    }
+
+    .weapon-btn {
+      width: 45px;
+      height: 45px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      touch-action: manipulation;
+    }
+
+    .weapon-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      transform: scale(1.1);
+    }
+
+    /* Touch Controls */
+    #joystick-zone {
+      position: absolute;
+      bottom: 30px;
+      /* Lower */
+      left: 30px;
+      width: 140px;
+      height: 140px;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    #look-zone {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    /* Action Buttons */
+    #actions {
+      position: absolute;
+      bottom: 50px;
+      right: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      pointer-events: auto;
+    }
+
+    .action-btn {
+      width: 70px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      backdrop-filter: blur(4px);
+      transition: 0.1s;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .action-btn:active {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0.95);
+    }
+
+    #btn-shoot {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.6);
+      width: 90px;
+      height: 90px;
+      font-size: 2rem;
+    }
+
+    /* Crosshair */
+    #crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .cross-line {
+      position: absolute;
+      background: white;
+      border-radius: 2px;
+    }
+
+    .cross-h {
+      width: 100%;
+      height: 2px;
+      top: 9px;
+      left: 0;
+    }
+
+    .cross-v {
+      width: 2px;
+      height: 100%;
+      top: 0;
+      left: 9px;
+    }
+
+    /* Joystick Styles */
+    .joystick-base {
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+    }
+
+    .joystick-stick {
+      width: 40%;
+      height: 40%;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      position: absolute;
+      top: 30%;
+      left: 30%;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body class="game-page">
+  <div id="canvas-container"></div>
+
+  <div id="gui">
+    <div id="stats-bar" class="hud-panel">
+      <div>
+        <div class="stat-box">
+          <i class="fas fa-heart" style="color: #ef4444"></i>
+          <span id="hp-text">100</span>
+        </div>
+        <div id="health-container">
+          <div id="hp-bar"></div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <i class="fas fa-star" style="color: #eab308"></i>
+        <span id="score">0</span>
+      </div>
+      <div class="stat-box">
+        <i class="fas fa-skull"></i> <span id="kill-count">0</span>
+      </div>
+    </div>
+
+    <div id="crosshair">
+      <div class="cross-line cross-h"></div>
+      <div class="cross-line cross-v"></div>
+    </div>
+
+    <!-- Touch Controls -->
+    <div id="joystick-zone">
+      <div class="joystick-base" id="joystick-base">
+        <div class="joystick-stick" id="joystick-stick"></div>
+      </div>
+    </div>
+
+    <div id="look-zone"></div>
+    <!-- Right half for camera swipe -->
+
+    <div id="actions">
+      <div class="action-btn" id="btn-jump">
+        <i class="fas fa-arrow-up"></i>
+      </div>
+      <div class="action-btn" id="btn-shoot">
+        <i class="fas fa-crosshairs"></i>
+      </div>
+    </div>
+
+    <div id="weapon-selector" class="hud-panel">
+      <div class="weapon-btn active" onclick="switchWeapon(0)">
+        <i class="fas fa-hand-point-right"></i>
+      </div>
+      <div class="weapon-btn" onclick="switchWeapon(1)">
+        <i class="fas fa-fighter-jet"></i>
+      </div>
+      <div class="weapon-btn" onclick="switchWeapon(2)">
+        <i class="fas fa-bomb"></i>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from "three";
+
+    // --- Configuration ---
+    const CONFIG = {
+      worldSize: 16, // 16x16 blocks
+      blockSize: 60,
+      roadWidth: 20,
+    };
+
+    const WEAPONS = [
+      {
+        name: "Pistol",
+        damage: 1,
+        rate: 400,
+        color: 0xffff00,
+        size: 0.3,
+        speed: 2,
+      },
+      {
+        name: "Rifle",
+        damage: 0.8,
+        rate: 100,
+        color: 0x00ffff,
+        size: 0.2,
+        speed: 3.5,
+      },
+      {
+        name: "Launcher",
+        damage: 5,
+        rate: 1200,
+        color: 0xff0000,
+        size: 0.8,
+        speed: 1.5,
+      },
+    ];
+
+    // --- Global State ---
+    let state = {
+      hp: 100,
+      score: 0,
+      kills: 0,
+      weaponIdx: 0,
+      move: { x: 0, y: 0 }, // Joystick input
+      look: { x: 0, y: 0 }, // Touch look input (accumulated)
+      isShooting: false,
+      lastShootTime: 0,
+      canJump: true,
+      velocity: new THREE.Vector3(),
+      onGround: false,
+    };
+
+    // --- Scene Setup ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
+    scene.fog = new THREE.Fog(0x87ceeb, 50, 300);
+
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: "high-performance",
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document
+      .getElementById("canvas-container")
+      .appendChild(renderer.domElement);
+
+    // --- Lights ---
+    const ambLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    dirLight.position.set(100, 200, 50);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.camera.near = 0.5;
+    dirLight.shadow.camera.far = 500;
+    const dSize = 250;
+    dirLight.shadow.camera.left = -dSize;
+    dirLight.shadow.camera.right = dSize;
+    dirLight.shadow.camera.top = dSize;
+    dirLight.shadow.camera.bottom = -dSize;
+    scene.add(dirLight);
+
+    // --- World & Physics Objects ---
+    const colliders = []; // Box3
+    const enemyColliders = []; // { mesh, box, hp }
+    const cars = []; // { mesh, speed, dir }
+
+    // --- Materials ---
+    const matGround = new THREE.MeshStandardMaterial({
+      color: 0x333333,
+      roughness: 0.9,
+    });
+    const matBuilding = new THREE.MeshStandardMaterial({
+      color: 0xaaaaaa,
+      roughness: 0.2,
+    });
+    const matRoad = new THREE.MeshStandardMaterial({
+      color: 0x111111,
+      roughness: 0.8,
+    });
+
+    // Ground
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(2000, 2000),
+      matGround,
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // --- City Generation ---
+    function createCity() {
+      const offset = (CONFIG.worldSize * CONFIG.blockSize) / 2;
+
+      for (let x = 0; x < CONFIG.worldSize; x++) {
+        for (let z = 0; z < CONFIG.worldSize; z++) {
+          const px = x * CONFIG.blockSize - offset;
+          const pz = z * CONFIG.blockSize - offset;
+
+          // Road Grid (Empty space between buildings)
+          // We place buildings with padding
+          const buildingW = CONFIG.blockSize - CONFIG.roadWidth;
+
+          if (Math.random() > 0.2) {
+            // Building
+            const h = Math.random() * 50 + 20;
+            const geo = new THREE.BoxGeometry(buildingW, h, buildingW);
+            const mat = matBuilding.clone();
+            mat.color.setHex(Math.random() * 0xffffff);
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(px, h / 2, pz);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+
+            // Collider
+            const box = new THREE.Box3().setFromObject(mesh);
+            colliders.push(box);
+          } else {
+            // Park / Open Area
+            const park = new THREE.Mesh(
+              new THREE.BoxGeometry(buildingW, 1, buildingW),
+              new THREE.MeshStandardMaterial({ color: 0x228b22 }),
+            );
+            park.position.set(px, 0.5, pz);
+            park.receiveShadow = true;
+            scene.add(park);
+          }
+        }
+      }
+    }
+    createCity();
+
+    // --- Player ---
+    const playerHeight = 2.5; // FPS style camera height
+    const pitchObj = new THREE.Group(); // Handles Vertical Look
+    const yawObj = new THREE.Group(); // Handles Horizontal Look & Movement
+
+    yawObj.add(pitchObj);
+    scene.add(yawObj);
+
+    // Add a "Body" mesh to yawObj so we cast shadow (not visible to camera usually, but good for reflections)
+    const playerBody = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.5, 1.8),
+      new THREE.MeshStandardMaterial({ color: 0x0000ff }),
+    );
+    playerBody.position.y = 0.9;
+    playerBody.castShadow = true;
+    yawObj.add(playerBody);
+
+    // Gun Model (Attached to pitchObj so it follows view)
+    const gunGroup = new THREE.Group();
+    const gunGeo = new THREE.BoxGeometry(0.2, 0.2, 0.8);
+    const gunMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const gunMesh = new THREE.Mesh(gunGeo, gunMat);
+    gunMesh.position.set(0.3, -0.3, -0.5);
+    gunGroup.add(gunMesh);
+    pitchObj.add(gunGroup);
+
+    yawObj.position.y = 50; // Start in air
+    yawObj.position.x = 0;
+    yawObj.position.z = 0;
+
+    // Camera attaching
+    pitchObj.add(camera);
+    camera.position.set(0, 1.6, 0); // Eye level relative to player base
+
+    // --- Controls: Joystick & Touch ---
+    const joystick = {
+      base: document.getElementById("joystick-base"),
+      stick: document.getElementById("joystick-stick"),
+      active: false,
+      origin: { x: 0, y: 0 },
+      curr: { x: 0, y: 0 },
+    };
+
+    const jZone = document.getElementById("joystick-zone");
+
+    jZone.addEventListener(
+      "touchstart",
+      (e) => {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        joystick.active = true;
+        joystick.origin.x = touch.clientX;
+        joystick.origin.y = touch.clientY;
+        joystick.curr.x = touch.clientX;
+        joystick.curr.y = touch.clientY;
+        updateJoystick();
+      },
+      { passive: false },
+    );
+
+    jZone.addEventListener(
+      "touchmove",
+      (e) => {
+        e.preventDefault();
+        if (!joystick.active) return;
+        const touch = e.changedTouches[0];
+        joystick.curr.x = touch.clientX;
+        joystick.curr.y = touch.clientY;
+        updateJoystick();
+      },
+      { passive: false },
+    );
+
+    const endJoystick = (e) => {
+      e.preventDefault();
+      joystick.active = false;
+      joystick.curr.x = joystick.origin.x;
+      joystick.curr.y = joystick.origin.y;
+      state.move.x = 0;
+      state.move.y = 0;
+      joystick.stick.style.transform = `translate(-50%, -50%)`;
+    };
+    jZone.addEventListener("touchend", endJoystick);
+    jZone.addEventListener("touchcancel", endJoystick);
+
+    function updateJoystick() {
+      const maxDist = 40;
+      let dx = joystick.curr.x - joystick.origin.x;
+      let dy = joystick.curr.y - joystick.origin.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > maxDist) {
+        const ratio = maxDist / dist;
+        dx *= ratio;
+        dy *= ratio;
+      }
+
+      joystick.stick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+      // Normalize -1 to 1
+      state.move.x = dx / maxDist;
+      state.move.y = dy / maxDist;
+    }
+
+    // --- Touch Look ---
+    const lookZone = document.getElementById("look-zone");
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    lookZone.addEventListener("touchstart", (e) => {
+      const t = e.changedTouches[0];
+      lastTouchX = t.clientX;
+      lastTouchY = t.clientY;
+    });
+
+    lookZone.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      const dx = t.clientX - lastTouchX;
+      const dy = t.clientY - lastTouchY;
+      lastTouchX = t.clientX;
+      lastTouchY = t.clientY;
+
+      // Apply rotation immediately
+      const sens = 0.003;
+      yawObj.rotation.y -= dx * sens;
+      pitchObj.rotation.x -= dy * sens;
+
+      // Clamp pitch
+      pitchObj.rotation.x = Math.max(
+        -1.5,
+        Math.min(1.5, pitchObj.rotation.x),
+      );
+    });
+
+    // --- Keyboard Controls (PC Fallback) ---
+    const keys = {};
+    window.addEventListener("keydown", (e) => {
+      keys[e.code] = true;
+      if (e.code === "Escape") {
+        document.exitPointerLock();
+        if (window.GameUI) window.GameUI.showSettings();
+      }
+    });
+    window.addEventListener("keyup", (e) => (keys[e.code] = false));
+    // Focus for controls
+    window.addEventListener("load", () => window.focus());
+    window.addEventListener("click", () => window.focus());
+
+    // --- Actions ---
+    const btnJump = document.getElementById("btn-jump");
+    const btnShoot = document.getElementById("btn-shoot");
+
+    const doJump = () => {
+      if (state.onGround) {
+        state.velocity.y = 15;
+        state.onGround = false;
+      }
+    };
+
+    const startShoot = (e) => {
+      if (e) e.preventDefault();
+      state.isShooting = true;
+    };
+    const stopShoot = (e) => {
+      if (e) e.preventDefault();
+      state.isShooting = false;
+    };
+
+    btnJump.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      doJump();
+    });
+    btnJump.addEventListener("click", doJump); // PC
+
+    btnShoot.addEventListener("touchstart", startShoot);
+    btnShoot.addEventListener("touchend", stopShoot);
+    btnShoot.addEventListener("mousedown", startShoot); // PC
+    btnShoot.addEventListener("mouseup", stopShoot);
+
+    // Weapon Switch
+    window.switchWeapon = (idx) => {
+      state.weaponIdx = idx;
+      document.querySelectorAll(".weapon-btn").forEach((b, i) => {
+        if (i === idx) b.classList.add("active");
+        else b.classList.remove("active");
+      });
+      // Visual Update
+      const w = WEAPONS[idx];
+      gunMesh.material.color.setHex(w.color);
+    };
+
+    // --- Traffic System ---
+    function spawnCar() {
+      const car = new THREE.Group();
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(2.5, 1.5, 5),
+        new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff }),
+      );
+      body.position.y = 0.75;
+      body.castShadow = true;
+      car.add(body);
+
+      // Wheels
+      const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.4, 12);
+      wheelGeo.rotateZ(Math.PI / 2);
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+
+      const w1 = new THREE.Mesh(wheelGeo, wheelMat);
+      w1.position.set(1.1, 0.5, 1.5);
+      car.add(w1);
+      const w2 = new THREE.Mesh(wheelGeo, wheelMat);
+      w2.position.set(-1.1, 0.5, 1.5);
+      car.add(w2);
+      const w3 = new THREE.Mesh(wheelGeo, wheelMat);
+      w3.position.set(1.1, 0.5, -1.5);
+      car.add(w3);
+      const w4 = new THREE.Mesh(wheelGeo, wheelMat);
+      w4.position.set(-1.1, 0.5, -1.5);
+      car.add(w4);
+
+      // Random Path Logic
+      const axis = Math.random() > 0.5 ? "x" : "z";
+      const offset =
+        Math.floor(Math.random() * CONFIG.worldSize) * CONFIG.blockSize -
+        (CONFIG.worldSize * CONFIG.blockSize) / 2 +
+        CONFIG.blockSize / 2;
+
+      if (axis === "x") {
+        car.position.set(-500, 0, offset);
+        car.userData = {
+          dir: new THREE.Vector3(1, 0, 0),
+          speed: 20 + Math.random() * 20,
+        };
+        car.rotation.y = Math.PI / 2;
+      } else {
+        car.position.set(offset, 0, -500);
+        car.userData = {
+          dir: new THREE.Vector3(0, 0, 1),
+          speed: 20 + Math.random() * 20,
+        };
+      }
+
+      scene.add(car);
+      cars.push(car);
+    }
+
+    setInterval(() => {
+      if (cars.length < 20) spawnCar();
+    }, 1000);
+
+    // --- NPCs ---
+    const enemies = [];
+
+    function spawnEnemy() {
+      const enemy = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 2.5, 1),
+        new THREE.MeshStandardMaterial({ color: 0xff0000 }),
+      );
+      enemy.position.set(
+        (Math.random() - 0.5) * 200,
+        5,
+        (Math.random() - 0.5) * 200,
+      );
+      enemy.castShadow = true;
+      // Physics data
+      const box = new THREE.Box3();
+      enemy.userData = { hp: 3, velocity: new THREE.Vector3(0, 0, 0) };
+
+      scene.add(enemy);
+      enemies.push(enemy);
+      enemyColliders.push({ mesh: enemy, box: box });
+    }
+
+    for (let i = 0; i < CONFIG.worldSize; i++) spawnEnemy(); // Approx count
+
+    // --- Projectiles ---
+    const bullets = [];
+
+    function shoot() {
+      const w = WEAPONS[state.weaponIdx];
+      const b = new THREE.Mesh(
+        new THREE.SphereGeometry(w.size, 8, 8),
+        new THREE.MeshStandardMaterial({
+          color: w.color,
+          emissive: w.color,
+          emissiveIntensity: 2,
+        }),
+      );
+
+      // Start at gun tip
+      const startPos = new THREE.Vector3();
+      gunMesh.getWorldPosition(startPos);
+
+      const dir = new THREE.Vector3(0, 0, -1);
+      dir.applyQuaternion(
+        pitchObj.getWorldQuaternion(new THREE.Quaternion()),
+      );
+
+      // Slight spread
+      if (state.weaponIdx === 2) {
+        // Launcher spread or just size
+        // already handled by size
+      }
+
+      b.position.copy(startPos);
+      b.userData = {
+        velocity: dir.multiplyScalar(w.speed * 20),
+        life: 100,
+        damage: w.damage,
+      };
+
+      bullets.push(b);
+      scene.add(b);
+    }
+
+    // --- Core Loop ---
+    const clock = new THREE.Clock();
+
+    function updatePhysics(dt) {
+      // Player Movement
+      // Combine Keyboard + Joystick
+      let inputX = state.move.x;
+      let inputY = state.move.y; // Y in Joystick is forward/back
+
+      if (keys["KeyW"]) inputY = -1;
+      if (keys["KeyS"]) inputY = 1;
+      if (keys["KeyA"]) inputX = -1;
+      if (keys["KeyD"]) inputX = 1;
+      if (keys["Space"] && state.onGround) doJump();
+
+      // Calculate Forward/Right vectors based on Yaw
+      const fwd = new THREE.Vector3(0, 0, -1).applyAxisAngle(
+        new THREE.Vector3(0, 1, 0),
+        yawObj.rotation.y,
+      );
+      const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(
+        new THREE.Vector3(0, 1, 0),
+        yawObj.rotation.y,
+      );
+
+      // Velocity logic
+      const speed = 10;
+      const targetVel = new THREE.Vector3();
+
+      if (Math.abs(inputY) > 0.1)
+        targetVel.addScaledVector(fwd, -inputY * speed);
+      if (Math.abs(inputX) > 0.1)
+        targetVel.addScaledVector(right, inputX * speed);
+
+      // Apply to state velocity (with inertia)
+      state.velocity.x = THREE.MathUtils.lerp(
+        state.velocity.x,
+        targetVel.x,
+        dt * 10,
+      );
+      state.velocity.z = THREE.MathUtils.lerp(
+        state.velocity.z,
+        targetVel.z,
+        dt * 10,
+      );
+
+      // Gravity
+      state.velocity.y -= 30 * dt;
+
+      // Collision Detection (Simple Box, prevent passing through buildings)
+      const nextPos = yawObj.position
+        .clone()
+        .addScaledVector(state.velocity, dt);
+
+      // Hit Floor
+      if (nextPos.y < 0) {
+        nextPos.y = 0;
+        state.velocity.y = 0;
+        state.onGround = true;
+      } else {
+        state.onGround = false;
+      }
+
+      // Check Buildings
+      const playerBox = new THREE.Box3();
+      // Slightly smaller box for physics to prevent sticking
+      playerBox.setFromCenterAndSize(
+        new THREE.Vector3(nextPos.x, nextPos.y + 0.9, nextPos.z),
+        new THREE.Vector3(0.8, 1.8, 0.8),
+      );
+
+      let collided = false;
+      for (let box of colliders) {
+        if (box.intersectsBox(playerBox)) {
+          // Determine collision type
+          // If we were above the box previous frame, it's a landing
+          const prevY = yawObj.position.y;
+          // box.max.y is building height
+          // If we are falling and our feet are near the top
+          const feetY = nextPos.y;
+          const roofY = box.max.y;
+
+          if (
+            state.velocity.y <= 0 &&
+            feetY >= roofY - 0.5 &&
+            prevY >= roofY - 0.5
+          ) {
+            // Landed on roof
+            nextPos.y = roofY;
+            state.velocity.y = 0;
+            state.onGround = true;
+          } else {
+            // Side collision - stop Movement
+            collided = true;
+            state.velocity.x = 0;
+            state.velocity.z = 0;
+            // Push out slightly?
+          }
+        }
+      }
+
+      if (!collided) yawObj.position.copy(nextPos);
+      else {
+        // If collided horizontally, keep Y movement
+        yawObj.position.y = nextPos.y;
+      }
+
+      // Bullets
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        const velocity = b.userData.velocity.clone().multiplyScalar(dt);
+        b.position.add(velocity);
+        b.userData.life--;
+
+        // Hit Floor
+        if (b.position.y < 0) {
+          scene.remove(b);
+          bullets.splice(i, 1);
+          continue;
+        }
+
+        // Hit Enmies
+        let hitFn = false;
+        for (let j = enemies.length - 1; j >= 0; j--) {
+          const e = enemies[j];
+          if (b.position.distanceTo(e.position) < 2) {
+            e.userData.hp -= b.userData.damage;
+            scene.remove(b);
+            bullets.splice(i, 1);
+            hitFn = true;
+
+            // Hurt Effect
+            e.material.color.setHex(0xffffff);
+            setTimeout(() => e.material.color.setHex(0xff0000), 100);
+
+            if (e.userData.hp <= 0) {
+              scene.remove(e);
+              enemies.splice(j, 1);
+              state.kills++;
+              state.score += 100;
+              document.getElementById("score").innerText = state.score;
+              document.getElementById("kill-count").innerText = state.kills;
+              spawnEnemy(); // Respawn
+            }
+            break;
+          }
+        }
+
+        if (hitFn) continue;
+
+        if (b.userData.life <= 0) {
+          scene.remove(b);
+          bullets.splice(i, 1);
+        }
+      }
+
+      // Enemies Logic
+      enemies.forEach((e) => {
+        const dirToP = yawObj.position.clone().sub(e.position).normalize();
+        e.userData.velocity.addScaledVector(dirToP, dt * 5); // Acceleration
+        e.userData.velocity.clampLength(0, 4); // Max speed
+
+        e.position.addScaledVector(e.userData.velocity, dt);
+        e.lookAt(yawObj.position);
+
+        // Gravity
+        if (e.position.y > 1.25) e.position.y -= 10 * dt;
+        if (e.position.y < 1.25) e.position.y = 1.25;
+
+        // Collide Player
+        if (e.position.distanceTo(yawObj.position) < 1.5) {
+          state.hp -= 10 * dt;
+          updateHP();
+        }
+      });
+
+      // Cars Logic
+      for (let i = cars.length - 1; i >= 0; i--) {
+        const c = cars[i];
+        c.position.addScaledVector(c.userData.dir, c.userData.speed * dt);
+        if (c.position.length() > 800) {
+          scene.remove(c);
+          cars.splice(i, 1);
+        }
+        // Hit Player
+        if (c.position.distanceTo(yawObj.position) < 4) {
+          state.hp -= 50 * dt;
+          // Push player
+          state.velocity.addScaledVector(c.userData.dir, 50 * dt);
+          updateHP();
+        }
+      }
+
+      // Shooting
+      if (state.isShooting || keys["Space"]) {
+        // Space for shooting on PC if held? no space is jump. Mouse click
+        const now = Date.now();
+        const w = WEAPONS[state.weaponIdx];
+        if (now - state.lastShootTime > w.rate) {
+          shoot();
+          state.lastShootTime = now;
+        }
+      }
+    }
+
+    function updateHP() {
+      if (state.hp < 0) state.hp = 0;
+      const bar = document.getElementById("hp-bar");
+      bar.style.width = state.hp + "%";
+      document.getElementById("hp-text").innerText = Math.floor(state.hp);
+
+      if (state.hp <= 0) {
+        // Game Over
+        if (window.addXP) addXP(state.score / 10);
+        if (window.GameUI)
+          window.GameUI.showGameOver(state.score, () => location.reload());
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.1);
+      updatePhysics(dt);
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Mouse Look for PC
+    document.addEventListener("click", () => {
+      document.body.requestPointerLock();
+    });
+    document.addEventListener("mousemove", (e) => {
+      if (document.pointerLockElement === document.body) {
+        yawObj.rotation.y -= e.movementX * 0.002;
+        pitchObj.rotation.x -= e.movementY * 0.002;
+        pitchObj.rotation.x = Math.max(
+          -1.5,
+          Math.min(1.5, pitchObj.rotation.x),
+        );
+      }
+    });
+    document.addEventListener("mousedown", () => (state.isShooting = true));
+    document.addEventListener("mouseup", () => (state.isShooting = false));
+
+    // Resize
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+
+</html>

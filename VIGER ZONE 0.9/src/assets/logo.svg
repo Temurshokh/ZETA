@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a1a;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0d0d2b;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="zGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00e5ff;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#7c4dff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#00e5ff;stop-opacity:1"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="outerGlow">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feFlood flood-color="#00e5ff" flood-opacity="0.3"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Subtle ring -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="rgba(0,229,255,0.06)" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="170" fill="none" stroke="rgba(124,77,255,0.04)" stroke-width="1"/>
+  <!-- Z Letter -->
+  <g filter="url(#outerGlow)">
+    <path d="M 150 145 L 362 145 L 362 185 L 220 330 L 362 330 L 362 370 L 150 370 L 150 330 L 292 185 L 150 185 Z"
+          fill="url(#zGrad)" opacity="0.95"/>
+  </g>
+  <!-- Accent dot -->
+  <circle cx="370" cy="148" r="8" fill="#00e5ff" opacity="0.9">
+    <animate attributeName="opacity" values="0.9;0.4;0.9" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Bottom text -->
+  <text x="256" y="420" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="Inter, sans-serif" font-size="22" font-weight="600" letter-spacing="8">ZETA</text>
+</svg>

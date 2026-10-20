@@ -1,0 +1,714 @@
+/* ===== ZETA v0.9 — VAU Games Styles ===== */
+
+/* VAU Section */
+.vau-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vau-header {
+    text-align: center;
+    margin-bottom: 1.2rem;
+}
+
+.vau-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.vau-title-row h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.vau-title-row h3 i {
+    color: #f59e0b;
+}
+
+.vau-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted, #888);
+    margin: 0.25rem 0 0 0;
+    text-align: left;
+}
+
+/* Balance Pill */
+.vau-balance-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.08));
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fbbf24;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.vau-balance-pill i {
+    color: #f59e0b;
+    font-size: 0.7rem;
+}
+
+.vau-balance-pill.vau-pulse {
+    animation: vauPulse 0.6s ease;
+}
+
+@keyframes vauPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    }
+}
+
+/* VAU Games Grid */
+.vau-games-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+@media (min-width: 600px) {
+    .vau-games-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* VAU Game Card */
+.vau-game-card {
+    cursor: pointer;
+    text-align: center;
+    padding: 0.8rem 0.6rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.vau-game-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.vau-game-card:active {
+    transform: scale(0.97);
+}
+
+.vau-game-icon {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: white;
+    margin-bottom: 0.3rem;
+}
+
+.vau-game-card h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 0;
+    color: #fff;
+}
+
+.vau-game-card p {
+    font-size: 0.68rem;
+    color: var(--text-muted, #888);
+    margin: 0;
+}
+
+.vau-game-card .btn {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.65rem;
+    margin-top: 0.3rem;
+}
+
+/* ===== VAU Modal ===== */
+.vau-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.vau-modal {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 380px;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.vau-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vau-modal-header h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fbbf24;
+    margin: 0;
+}
+
+.vau-modal-close {
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: #aaa;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.vau-modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.vau-modal-body {
+    padding: 1.2rem;
+}
+
+/* ===== Shared Game Content ===== */
+.vau-game-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.vau-choose-label {
+    font-size: 0.8rem;
+    color: var(--text-muted, #888);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+.vau-cost-label {
+    font-size: 0.85rem;
+    color: #ccc;
+    margin: 0;
+}
+
+.vau-cost-label strong {
+    color: #fbbf24;
+}
+
+.vau-warn {
+    color: #ef4444;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Bet Section */
+.vau-bet-section {
+    width: 100%;
+    text-align: center;
+}
+
+.vau-bet-label {
+    font-size: 0.75rem;
+    color: var(--text-muted, #888);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.vau-bet-options {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.vau-bet-btn {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.05));
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    padding: 0.45rem 0.9rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vau-bet-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(251, 191, 36, 0.12));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+}
+
+.vau-bet-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.vau-bet-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Result Area */
+.vau-result-area {
+    width: 100%;
+    text-align: center;
+    min-height: 40px;
+}
+
+.vau-result-win,
+.vau-result-lose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    animation: resultPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes resultPop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.vau-result-win {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.vau-result-lose {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* ===== COIN FLIP ===== */
+.vau-coin-display {
+    width: 100px;
+    height: 100px;
+    perspective: 600px;
+    margin: 0.5rem 0;
+}
+
+.vau-coin-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.vau-coin-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    backface-visibility: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+}
+
+.vau-coin-heads {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.vau-coin-tails {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+.vau-coin-spinning .vau-coin-inner {
+    animation: coinSpin 1.2s cubic-bezier(0.2, 0, 0.8, 1);
+}
+
+@keyframes coinSpin {
+    0% {
+        transform: rotateY(0);
+    }
+
+    100% {
+        transform: rotateY(1800deg);
+    }
+}
+
+.vau-coin-tails-result .vau-coin-inner {
+    transform: rotateY(180deg);
+}
+
+.vau-coin-heads-result .vau-coin-inner {
+    transform: rotateY(0deg);
+}
+
+/* Side buttons */
+.vau-side-btns {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.vau-side-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: #aaa;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vau-side-btn.active {
+    border-color: #fbbf24;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.15);
+}
+
+.vau-side-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== MYSTERY BOX ===== */
+.vau-boxes-row {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.vau-box {
+    width: 90px;
+    height: 90px;
+    perspective: 400px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.vau-box:hover:not(.vau-box-opened) {
+    transform: translateY(-4px) scale(1.05);
+}
+
+.vau-box:active:not(.vau-box-opened) {
+    transform: scale(0.95);
+}
+
+.vau-box-front,
+.vau-box-back {
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    transition: transform 0.6s ease;
+}
+
+.vau-box {
+    position: relative;
+}
+
+.vau-box-front {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    color: white;
+    border: 2px solid rgba(139, 92, 246, 0.4);
+    z-index: 2;
+}
+
+.vau-box-back {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1.2rem;
+    gap: 0.3rem;
+    font-weight: 700;
+    transform: rotateY(180deg);
+}
+
+.vau-box-back span {
+    font-size: 0.7rem;
+}
+
+.vau-box-opened .vau-box-front {
+    transform: rotateY(180deg);
+}
+
+.vau-box-opened .vau-box-back {
+    transform: rotateY(0deg);
+}
+
+.vau-box-win .vau-box-back {
+    border-color: #10b981;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    color: #10b981;
+}
+
+.vau-box-empty .vau-box-back {
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.vau-box-other {
+    opacity: 0.5;
+}
+
+/* ===== RISK LADDER ===== */
+.vau-ladder-container {
+    width: 100%;
+}
+
+.vau-ladder-current {
+    text-align: center;
+    padding: 0.6rem;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    border-radius: 12px;
+    color: #fbbf24;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.vau-ladder-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.vau-ladder-step {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.8rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.8rem;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.vau-ladder-label {
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.vau-ladder-val {
+    font-weight: 700;
+}
+
+.vau-ladder-step.reached {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: #10b981;
+}
+
+.vau-ladder-step.reached i {
+    color: #10b981;
+}
+
+.vau-ladder-step.current {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+}
+
+.vau-ladder-step.fallen {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    animation: ladderShake 0.4s ease;
+}
+
+@keyframes ladderShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    75% {
+        transform: translateX(6px);
+    }
+}
+
+.vau-ladder-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.vau-btn-climb,
+.vau-btn-cashout,
+.vau-btn-retry {
+    padding: 0.6rem 1.2rem;
+    border-radius: 14px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+}
+
+.vau-btn-climb {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+}
+
+.vau-btn-climb:hover {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+.vau-btn-cashout {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.vau-btn-cashout:hover {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+}
+
+.vau-btn-retry {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.08));
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    color: #fbbf24;
+    margin-top: 0.75rem;
+}
+
+.vau-btn-retry:hover {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(251, 191, 36, 0.12));
+}
+
+.vau-ladder-fell i {
+    font-size: 1.4rem;
+}
+
+/* ===== Mobile Tweaks ===== */
+@media (max-width: 360px) {
+    .vau-game-icon {
+        font-size: 1.3rem;
+    }
+
+    .vau-game-card h4 {
+        font-size: 0.78rem;
+    }
+
+    .vau-box {
+        width: 75px;
+        height: 75px;
+    }
+
+    .vau-coin-display {
+        width: 80px;
+        height: 80px;
+    }
+
+    .vau-bet-btn {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.75rem;
+    }
+}

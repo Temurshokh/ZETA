@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZETA | Harajatlar</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/lang.js" defer></script>
+  <style>
+    .expenses-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .expenses-header h1 {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      margin-bottom: 0.25rem;
+    }
+
+    .expenses-header p {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    /* ── Summary Card ── */
+    .summary-card {
+      background: linear-gradient(135deg, hsla(260, 95%, 55%, 0.2), hsla(220, 95%, 55%, 0.1));
+      border: 1px solid hsla(260, 95%, 75%, 0.25);
+      padding: 1.75rem 1.5rem;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 70% 30%, hsla(260, 95%, 75%, 0.08), transparent 50%);
+      pointer-events: none;
+    }
+
+    .summary-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .total-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .total-amount {
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 800;
+      color: var(--text-color);
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .currency {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* ── Input Card ── */
+    .input-card {
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .categories-grid {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .categories-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-btn {
+      padding: 0.5rem 0.9rem;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.85rem;
+    }
+
+    .cat-btn:active {
+      transform: scale(0.95);
+    }
+
+    .cat-btn.active {
+      background: linear-gradient(135deg, var(--primary), hsla(260, 95%, 50%, 1));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 15px -3px var(--primary-glow);
+    }
+
+    .input-group {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .form-field {
+      position: relative;
+    }
+
+    .form-control {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      color: white;
+      font-size: 1rem;
+      width: 100%;
+      transition: all 0.25s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 0 3px hsla(260, 95%, 75%, 0.1);
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    .char-counter {
+      position: absolute;
+      right: 12px;
+      bottom: -18px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .form-control:focus~.char-counter {
+      opacity: 1;
+    }
+
+    .char-counter.warn {
+      color: var(--warning);
+    }
+
+    .char-counter.limit {
+      color: var(--danger);
+    }
+
+    .add-btn {
+      padding: 0.85rem;
+      font-size: 1rem;
+      border-radius: 14px;
+      font-weight: 700;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    /* ── History ── */
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .history-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      animation: slideIn 0.3s ease-out;
+      transition: background 0.2s;
+    }
+
+    .expense-item:active {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .expense-info h4 {
+      font-size: 0.95rem;
+      margin: 0 0 2px;
+      font-weight: 600;
+    }
+
+    .expense-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .expense-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .expense-val {
+      font-weight: 700;
+      color: var(--danger);
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .delete-btn {
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.4rem;
+      transition: all 0.2s;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .delete-btn:active {
+      color: var(--danger);
+      background: rgba(255, 50, 80, 0.1);
+    }
+
+    .clear-btn {
+      width: auto !important;
+      padding: 0.4rem 0.8rem !important;
+      font-size: 0.8rem;
+      border-radius: 50px;
+      opacity: 0.7;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 2.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.3;
+      display: block;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .total-amount {
+        font-size: clamp(1.8rem, 6vw, 2.4rem);
+      }
+
+      .expense-item {
+        padding: 0.7rem 0.85rem;
+      }
+    }
+  </style>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2 onclick="location.href='../index.html'" style="cursor: pointer;">ZETA</h2>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main>
+    <div class="expenses-header">
+      <h1 data-trn="tool-expenses-title">💰 Harajatlar</h1>
+      <p data-trn="tool-expenses-desc">Moliya nazorati va rejalashtirish</p>
+    </div>
+
+    <!-- Summary -->
+    <section class="summary-card">
+      <div class="summary-label">Umumiy sarf (oylik)</div>
+      <div class="total-row">
+        <div class="total-amount" id="total-expense">0</div>
+        <div class="currency">so'm</div>
+      </div>
+    </section>
+
+    <!-- Input -->
+    <section class="glass-panel input-card">
+      <div class="categories-grid" id="cat-grid">
+        <button class="cat-btn active" data-cat="ovqat">🍕 Ovqat</button>
+        <button class="cat-btn" data-cat="transport">🚗 Transport</button>
+        <button class="cat-btn" data-cat="shoppng">🛍 Xarid</button>
+        <button class="cat-btn" data-cat="kommunal">🏠 Uy-joy</button>
+        <button class="cat-btn" data-cat="boshqa">✨ Boshqa</button>
+      </div>
+
+      <div class="input-group">
+        <div class="form-field">
+          <input type="number" id="exp-amount" class="form-control" placeholder="Summa..." max="5000000000"
+            oninput="validateAmount(this)" />
+        </div>
+        <div class="form-field">
+          <input type="text" id="exp-note" class="form-control" placeholder="Izoh (ixtiyoriy)" maxlength="55"
+            oninput="updateNoteCounter(this)" />
+          <span class="char-counter" id="note-counter">0/55</span>
+        </div>
+        <button class="btn btn-primary add-btn" onclick="addExpense()">
+          <i class="fas fa-plus"></i> Qo'shish
+        </button>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section>
+      <div class="history-header">
+        <h3><i class="fas fa-history" style="opacity: 0.5; margin-right: 6px;"></i>Tarix</h3>
+        <button class="btn btn-glass clear-btn" onclick="clearHistory()">
+          <i class="fas fa-broom"></i> Tozalash
+        </button>
+      </div>
+      <div class="history-list" id="exp-history">
+        <!-- History items injected here -->
+      </div>
+    </section>
+  </main>
+
+  <nav class="tab-bar"></nav>
+
+  <script>
+    // ── CONSTANTS ──
+    const MAX_AMOUNT = 5000000000;       // 5 milliard - per entry
+    const MAX_TOTAL = 9999999999999;     // ~10 trillion - monthly total cap
+    const MAX_NOTE_LEN = 55;
+
+    // ── STATE ──
+    let expenses = JSON.parse(localStorage.getItem('zeta_expenses')) || [];
+    let currentCategory = 'ovqat';
+
+    // ── CATEGORY SELECTION ──
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.cat;
+      });
+    });
+
+    // ── VALIDATION ──
+    function validateAmount(input) {
+      let val = parseFloat(input.value);
+      if (val > MAX_AMOUNT) {
+        input.value = MAX_AMOUNT;
+      }
+      if (val < 0) {
+        input.value = '';
+      }
+    }
+
+    function updateNoteCounter(input) {
+      const counter = document.getElementById('note-counter');
+      const len = input.value.length;
+      counter.textContent = `${len}/${MAX_NOTE_LEN}`;
+      counter.classList.toggle('warn', len > 40);
+      counter.classList.toggle('limit', len >= MAX_NOTE_LEN);
+      counter.style.opacity = '1';
+    }
+
+    // ── ADD EXPENSE ──
+    function addExpense() {
+      const amountInput = document.getElementById('exp-amount');
+      const noteInput = document.getElementById('exp-note');
+      const amount = parseFloat(amountInput.value);
+      const note = noteInput.value.trim().slice(0, MAX_NOTE_LEN) || currentCategory;
+
+      if (!amount || amount <= 0) {
+        shakeElement(amountInput);
+        return;
+      }
+
+      if (amount > MAX_AMOUNT) {
+        amountInput.value = MAX_AMOUNT;
+        shakeElement(amountInput);
+        return;
+      }
+
+      // Check total limit
+      const currentTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
+      if (currentTotal + amount > MAX_TOTAL) {
+        alert(`Oylik limit: ${MAX_TOTAL.toLocaleString()} so'm`);
+        return;
+      }
+
+      const newExpense = {
+        id: Date.now(),
+        amount,
+        note,
+        category: currentCategory,
+        date: new Date().toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' })
+      };
+
+      expenses.unshift(newExpense);
+      saveExpenses();
+      renderExpenses();
+
+      // Clear inputs
+      amountInput.value = '';
+      noteInput.value = '';
+      document.getElementById('note-counter').textContent = `0/${MAX_NOTE_LEN}`;
+
+      // Add XP if exists
+      if (window.giveXP) window.giveXP(5);
+    }
+
+    function shakeElement(el) {
+      el.style.animation = 'none';
+      el.offsetHeight; // trigger reflow
+      el.style.animation = 'shake 0.4s ease';
+      el.style.borderColor = 'var(--danger)';
+      setTimeout(() => {
+        el.style.borderColor = '';
+        el.style.animation = '';
+      }, 600);
+    }
+
+    function deleteExpense(id) {
+      expenses = expenses.filter(e => e.id !== id);
+      saveExpenses();
+      renderExpenses();
+    }
+
+    function clearHistory() {
+      if (confirm("Barcha harajatlar o'chirilsinmi?")) {
+        expenses = [];
+        saveExpenses();
+        renderExpenses();
+      }
+    }
+
+    function saveExpenses() {
+      localStorage.setItem('zeta_expenses', JSON.stringify(expenses));
+    }
+
+    function renderExpenses() {
+      const historyList = document.getElementById('exp-history');
+      const totalDisplay = document.getElementById('total-expense');
+
+      // Update Total
+      const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+      totalDisplay.innerText = total.toLocaleString();
+
+      // Render List
+      historyList.innerHTML = '';
+      if (expenses.length === 0) {
+        historyList.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-receipt"></i>
+            Hali harajatlar yo'q
+          </div>`;
+        return;
+      }
+
+      expenses.forEach(e => {
+        const item = document.createElement('div');
+        item.className = 'expense-item';
+        item.innerHTML = `
+          <div class="expense-info">
+            <h4>${escapeHTML(e.note)}</h4>
+            <span>${e.date} • ${getCatEmoji(e.category)}</span>
+          </div>
+          <div class="expense-right">
+            <span class="expense-val">-${e.amount.toLocaleString()}</span>
+            <i class="fas fa-trash delete-btn" onclick="deleteExpense(${e.id})"></i>
+          </div>
+        `;
+        historyList.appendChild(item);
+      });
+    }
+
+    function getCatEmoji(cat) {
+      const icons = {
+        'ovqat': '🍕 Ovqat',
+        'transport': '🚗 Transport',
+        'shoppng': '🛍 Xarid',
+        'kommunal': '🏠 Uy-joy',
+        'boshqa': '✨ Boshqa'
+      };
+      return icons[cat] || '💰';
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // CSS shake animation
+    const shakeStyle = document.createElement('style');
+    shakeStyle.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+      }
+    `;
+    document.head.appendChild(shakeStyle);
+
+    // Initial Render
+    document.addEventListener('DOMContentLoaded', renderExpenses);
+  </script>
+</body>
+
+</html>

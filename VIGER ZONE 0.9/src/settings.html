@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#00e5ff" />
+  <title>Sozlamalar | ZETA</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="js/core/state.js" defer></script>
+  <script src="js/core/telegram.js" defer></script>
+  <script src="js/xp.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/achievements.js" defer></script>
+  <script src="js/core/music.js" defer></script>
+  <script src="js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <h2 style="margin: 0;">ZETA</h2>
+        <div id="streak-badge-container"></div>
+      </div>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main style="max-width: min(600px, 100%); width: 100%;">
+
+    <section class="glass-panel" style="margin-bottom: 1.5rem;">
+      <h3 style="color: var(--primary-accent);"><i class="fas fa-globe"></i> <span data-trn="set-group-lang">Tizim va
+          Til</span></h3>
+      <div class="setting-item" style="border-bottom: none;">
+        <div class="setting-label">
+          <i class="fas fa-language"></i>
+          <span data-trn="set-lang">Tizim Tili</span>
+        </div>
+        <div class="custom-select-wrapper">
+          <select id="lang-select" onchange="saveSettings()"
+            style="padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 0.9rem; cursor: pointer;">
+            <option value="uz" style="color: black;">O'zbek</option>
+            <option value="en" style="color: black;">English</option>
+            <option value="ru" style="color: black;">Русский</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass-panel" style="margin-bottom: 1.5rem;">
+      <h3 style="color: var(--primary-accent);"><i class="fas fa-music"></i> <span data-trn="set-group-audio">Ovoz va
+          Musiqa</span></h3>
+      <div class="setting-item">
+        <div class="setting-label">
+          <i class="fas fa-volume-up"></i>
+          <span data-trn="set-sound">O'yin Tovushlari</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="sound-toggle" checked onchange="saveSettings()" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-label">
+          <i class="fas fa-headphones"></i>
+          <span data-trn="set-bg-music">Fon Musiqasi</span>
+        </div>
+        <select id="music-select" onchange="saveSettings()"
+          style="padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 0.9rem; cursor: pointer; max-width: 150px;">
+          <option value="off" style="color: black;">O'chirilgan</option>
+          <option value="night-chill" style="color: black;">🌙 Night Chill</option>
+          <option value="ocean-waves" style="color: black;">🌊 Ocean Waves</option>
+          <option value="lofi-beat" style="color: black;">🔥 Lo-fi Beat</option>
+        </select>
+      </div>
+      <div class="setting-item" style="border-bottom: none;">
+        <div class="setting-label">
+          <i class="fas fa-sliders-h"></i>
+          <span data-trn="set-music-vol">Musiqa Ovozi</span>
+        </div>
+        <input type="range" id="music-volume" min="0" max="100" value="30" oninput="saveSettings()"
+          style="width: 120px; accent-color: var(--primary-accent);" />
+      </div>
+    </section>
+
+    <section class="glass-panel" style="margin-bottom: 1.5rem;">
+      <h3 style="color: var(--primary-accent);"><i class="fas fa-cogs"></i> <span
+          data-trn="set-group-extra">Qo'shimcha</span></h3>
+      <div class="setting-item">
+        <div class="setting-label">
+          <i class="fas fa-bell"></i>
+          <span data-trn="set-notif">Bildirishnomalar (XP)</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notif-toggle" checked onchange="saveSettings()" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="setting-item" style="border-bottom: none;">
+        <div class="setting-label">
+          <i class="fas fa-sync"></i>
+          <span data-trn="set-crypto-ref">Kripto Yangilanish</span>
+        </div>
+        <select id="crypto-refresh" onchange="saveSettings()"
+          style="padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 0.9rem; cursor: pointer;">
+          <option value="15" style="color: black;">15 soniya</option>
+          <option value="30" selected style="color: black;">30 soniya</option>
+          <option value="60" style="color: black;">1 daqiqa</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="glass-panel">
+      <h3 style="color: var(--danger);"><i class="fas fa-shield-alt"></i> <span data-trn="set-group-data">Ilova
+          Ma'lumotlari</span></h3>
+      <div class="setting-item">
+        <div class="setting-label">
+          <i class="fab fa-telegram" style="color: #0088cc;"></i>
+          <span data-trn="set-founder">Asoschining kanali</span>
+        </div>
+        <a href="https://t.me/VIGER_ZONE" target="_blank" id="telegram-link" class="btn btn-glass btn-sm"
+          onclick="claimFounderBonus()" style="text-decoration: none;">
+          <i class="fab fa-telegram"></i> <span data-trn="set-subscribe">Obuna bo'lish</span> <span id="bonus-badge"
+            class="bonus-badge">+100 XP</span>
+        </a>
+      </div>
+      <div class="mt-4 text-center">
+        <button onclick="resetData()" class="btn"
+          style="background: var(--danger); color: white; width: 100%; border-radius: 12px; padding: 12px;">
+          <i class="fas fa-trash-alt"></i> <span data-trn="set-reset">Barcha ma'lumotlarni o'chirish</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section class="glass-panel" style="margin-top: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="margin: 0;"><i class="fas fa-trophy"></i> Yutuqlar</h3>
+        <span id="achieve-count" style="font-size: 0.75rem; color: var(--text-muted);">0/9</span>
+      </div>
+      <div id="achievements-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    </section>
+
+    <!-- Update History Section -->
+    <section class="glass-panel" style="margin-top: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="margin: 0;"><i class="fas fa-history"></i> Tarix</h3>
+        <span id="history-reward" class="bonus-badge" style="cursor: pointer;" onclick="claimHistoryBonus()">
+          +20 XP
+        </span>
+      </div>
+
+      <div id="update-history" class="update-history">
+        <!-- Animated version list -->
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .bonus-badge {
+      background: var(--success);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+
+    .bonus-badge.claimed {
+      background: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select {
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      outline: none;
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+    }
+
+    input:checked+.slider {
+      background-color: var(--success);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
+
+    .slider.round {
+      border-radius: 24px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+    /* Update History Styles */
+    .update-history {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .version-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 15px;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: slideInVersion 0.4s forwards;
+    }
+
+    .version-item.current {
+      border-color: var(--primary-accent);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    @keyframes slideInVersion {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .version-tag {
+      background: var(--primary-accent);
+      color: white;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .version-tag.current {
+      background: var(--success);
+    }
+
+    .version-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .version-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .version-changes {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .version-changes li {
+      margin-bottom: 3px;
+    }
+  </style>
+
+  <script>
+    // Multi-language version history
+    const versionHistory = {
+      uz: [
+        {
+          version: "0.9",
+          date: "2026-03-13",
+          title: "Virtual Aurum 💰✨",
+          current: true,
+          changes: [
+            "💰 VAU valyutasi (200 VAU boshlang'ich)",
+            "🎲 VAU o'yinlar: Tanga, Sirli Quti, Narvon",
+            "🏆 Yutuqlar endi VAU ham beradi",
+            "🎰 Lucky Spin VAU bonuslari"
+          ]
+        },
+        {
+          version: "0.8",
+          date: "2026-03-06",
+          title: "Sound & Soul 🎵✨",
+          changes: [
+            "🎵 Fon musiqasi (3 ta trek)",
+            "🔧 Xatolar tuzatildi, kod tozalandi",
+            "🗄️ Ma'lumotlar xavfsiz migratsiyasi",
+            "🎨 Minor UI yaxshilanishlar"
+          ]
+        },
+        {
+          version: "0.7",
+          date: "2026-02-25",
+          title: "LTS Release 🛡️⚡",
+          changes: [
+            "🛡️ LTS Arxitektura va State Manager",
+            "📲 Telegram Mini App SDK",
+            "📴 PWA — offline ishlash",
+            "🎨 Yangi logo va favicon",
+            "♿ Reduced motion qo'llab-quvvatlash",
+            "🎰 Lucky Spin — omad g'ildiragi (100 XP)"
+          ]
+        },
+        {
+          version: "0.6",
+          date: "2026-02-11",
+          title: "Blue Release 📱💎",
+          changes: [
+            "🎨 Yangi to'q ko'k dizayn",
+            "📱 Universal Mobil adaptatsiya",
+            "🏆 Achievementlar tizimi",
+            "🎮 Flappy Jump o'yini",
+            "🔥 Daily Streak bonuslari"
+          ]
+        },
+        {
+          version: "0.5",
+          date: "2026-02-03",
+          title: "Kripto Grafiklar + O'yinlar",
+          changes: [
+            "📈 Kripto grafiklar (1H/24H/7D/1M)",
+            "🐍 Snake: Auto-start, katta tugmalar",
+            "⭐ Top Gainers/Losers",
+            "🎨 Grafik mavzular (3x)"
+          ]
+        },
+        {
+          version: "0.4",
+          date: "2026-01-28",
+          title: "O'yinlar Yangilanishi",
+          changes: [
+            "🐍 Snake: Devorlar o'ldirmaydi",
+            "🚀 Space Tunnel: 2s himoya qalqoni",
+            "🏎️ Neon Race: Touch boshqaruv",
+            "🌲 Story: Interaktiv kvest"
+          ]
+        },
+        {
+          version: "0.3",
+          date: "2026-01-20",
+          title: "Kripto+",
+          changes: [
+            "📊 Market tafsilotlari",
+            "⭐ Sevimlilar tizimi",
+            "📱 Mobil tuzatishlar"
+          ]
+        },
+        {
+          version: "0.2",
+          date: "2026-01-15",
+          title: "Mobil Adaptatsiya",
+          changes: [
+            "📱 9:16 ekran moslashuvi",
+            "🎨 UI yaxshilanishlar"
+          ]
+        },
+        {
+          version: "0.1",
+          date: "2026-01-10",
+          title: "Boshlanish",
+          changes: [
+            "🏠 Bosh Sahifa",
+            "🎮 O'yinlar",
+            "💰 Kripto narxlar"
+          ]
+        }
+      ],
+      en: [
+        {
+          version: "0.9",
+          date: "2026-03-13",
+          title: "Virtual Aurum 💰✨",
+          current: true,
+          changes: [
+            "💰 VAU currency (200 VAU starting)",
+            "🎲 VAU Games: Coin Flip, Mystery Box, Risk",
+            "🏆 Achievements give +5 VAU",
+            "🎰 Lucky Spin VAU bonuses"
+          ]
+        },
+        {
+          version: "0.8",
+          date: "2026-03-06",
+          title: "Sound & Soul 🎵✨",
+          changes: [
+            "🎵 Background music (3 tracks)",
+            "🔧 Bug fixes & cleanup",
+            "🗄️ Safe data migration system",
+            "🎨 Minor UI improvements"
+          ]
+        },
+        {
+          version: "0.7",
+          date: "2026-02-25",
+          title: "LTS Release 🛡️⚡",
+          changes: [
+            "🛡️ LTS Architecture & State Manager",
+            "📲 Telegram Mini App SDK",
+            "📴 PWA — offline support",
+            "🎨 New logo & favicon",
+            "♿ Reduced motion support",
+            "🎰 Lucky Spin — fortune wheel (100 XP)"
+          ]
+        },
+        {
+          version: "0.6",
+          date: "2026-02-11",
+          title: "Blue Release 📱💎",
+          changes: [
+            "🎨 New Dark Blue design",
+            "📱 Universal Mobile adaptation",
+            "🏆 Achievement system",
+            "🎮 Flappy Jump game",
+            "🔥 Daily Streak rewards"
+          ]
+        },
+        {
+          version: "0.5",
+          date: "2026-02-03",
+          title: "Crypto Charts + Games Update",
+          changes: [
+            "📈 Crypto charts (1H/24H/7D/1M)",
+            "🐍 Snake: Auto-start, larger controls",
+            "⭐ Top Gainers/Losers",
+            "🎨 Chart Themes (3x)"
+          ]
+        },
+        {
+          version: "0.4",
+          date: "2026-01-28",
+          title: "Games Upgrade",
+          changes: [
+            "🐍 Snake: No wall death",
+            "🚀 Space Tunnel: 2s shield",
+            "🏎️ Neon Race: Touch controls",
+            "🌲 Story: Interactive quest"
+          ]
+        },
+        {
+          version: "0.3",
+          date: "2026-01-20",
+          title: "Crypto+",
+          changes: [
+            "📊 Market details",
+            "⭐ Favorites system",
+            "📱 Mobile fixes"
+          ]
+        },
+        {
+          version: "0.2",
+          date: "2026-01-15",
+          title: "Mobile Adaptation",
+          changes: [
+            "📱 9:16 screen support",
+            "🎨 UI improvements"
+          ]
+        },
+        {
+          version: "0.1",
+          date: "2026-01-10",
+          title: "Launch",
+          changes: [
+            "🏠 Home page",
+            "🎮 Games",
+            "💰 Crypto prices"
+          ]
+        }
+      ],
+      ru: [
+        {
+          version: "0.9",
+          date: "2026-03-13",
+          title: "Virtual Aurum 💰✨",
+          current: true,
+          changes: [
+            "💰 Валюта VAU (200 VAU на старте)",
+            "🎲 VAU Игры: Монетка, Тайная Коробка, Риск",
+            "🏆 Достижения дают +5 VAU",
+            "🎰 Бонусы VAU в Lucky Spin"
+          ]
+        },
+        {
+          version: "0.8",
+          date: "2026-03-06",
+          title: "Sound & Soul 🎵✨",
+          changes: [
+            "🎵 Фоновая музыка (3 трека)",
+            "🔧 Исправления ошибок",
+            "🗄️ Безопасная миграция данных",
+            "🎨 Мелкие улучшения UI"
+          ]
+        },
+        {
+          version: "0.7",
+          date: "2026-02-25",
+          title: "LTS Release 🛡️⚡",
+          changes: [
+            "🛡️ LTS Архитектура и State Manager",
+            "📲 Telegram Mini App SDK",
+            "📴 PWA — оффлайн режим",
+            "🎨 Новый логотип и фавикон",
+            "♿ Поддержка reduced motion",
+            "🎰 Lucky Spin — колесо фортуны (100 XP)"
+          ]
+        },
+        {
+          version: "0.6",
+          date: "2026-02-11",
+          title: "Blue Release 📱💎",
+          changes: [
+            "🎨 Новый тёмно-синий дизайн",
+            "📱 Универсальная мобильная адаптация",
+            "🏆 Система достижений",
+            "🎮 Игра Flappy Jump",
+            "🔥 Бонусы Daily Streak"
+          ]
+        },
+        {
+          version: "0.5",
+          date: "2026-02-03",
+          title: "Крипто Графики + Обновление Игр",
+          changes: [
+            "📈 Крипто графики (1Ч/24Ч/7Д/1М)",
+            "🐍 Snake: Авто-старт, большие кнопки",
+            "⭐ Топ Gainers/Losers",
+            "🎨 Темы графиков (3x)"
+          ]
+        },
+        {
+          version: "0.4",
+          date: "2026-01-28",
+          title: "Обновление Игр",
+          changes: [
+            "🐍 Snake: Стены не убивают",
+            "🚀 Space Tunnel: 2с щит",
+            "🏎️ Neon Race: Сенсорное управление",
+            "🌲 Story: Интерактивный квест"
+          ]
+        },
+        {
+          version: "0.3",
+          date: "2026-01-20",
+          title: "Крипто+",
+          changes: [
+            "📊 Детали рынка",
+            "⭐ Система избранного",
+            "📱 Мобильные исправления"
+          ]
+        },
+        {
+          version: "0.2",
+          date: "2026-01-15",
+          title: "Мобильная Адаптация",
+          changes: [
+            "📱 Поддержка 9:16",
+            "🎨 Улучшения UI"
+          ]
+        },
+        {
+          version: "0.1",
+          date: "2026-01-10",
+          title: "Запуск",
+          changes: [
+            "🏠 Главная",
+            "🎮 Игры",
+            "💰 Крипто цены"
+          ]
+        }
+      ]
+    };
+
+    function getLanguage() {
+      const settings = JSON.parse(localStorage.getItem("zeta_settings") || '{}');
+      return settings.lang || 'uz';
+    }
+
+    function renderUpdateHistory() {
+      const container = document.getElementById('update-history');
+      if (!container) return;
+
+      const lang = getLanguage();
+      const history = versionHistory[lang] || versionHistory.uz;
+
+      container.innerHTML = history.map((v, i) => `
+        <div class="version-item ${v.current ? 'current' : ''}" style="animation-delay: ${i * 0.1}s;">
+          <div class="version-header">
+            <span class="version-tag ${v.current ? 'current' : ''}">v${v.version}${v.current ? ' ✓' : ''}</span>
+            <span class="version-date">${v.date}</span>
+          </div>
+          <div class="version-title">${v.title}</div>
+          <ul class="version-changes">
+            ${v.changes.map(c => `<li>${c}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('');
+    }
+
+    function claimHistoryBonus() {
+      const claimed = localStorage.getItem('zeta_history_claimed');
+      if (claimed) return;
+
+      if (typeof addXP === 'function') {
+        addXP(20);
+      } else {
+        let currentXP = parseInt(localStorage.getItem('zeta_xp') || '0');
+        currentXP += 20;
+        localStorage.setItem('zeta_xp', currentXP.toString());
+      }
+
+      localStorage.setItem('zeta_history_claimed', 'true');
+      updateHistoryBadge();
+
+      // Show animation
+      const badge = document.getElementById('history-reward');
+      if (badge) {
+        badge.style.transform = 'scale(1.3)';
+        setTimeout(() => {
+          badge.style.transform = 'scale(1)';
+        }, 200);
+      }
+
+      alert('+20 XP olindi! Yangilanish tarixini o\'qiganingiz uchun rahmat! 🎉');
+    }
+
+    function updateHistoryBadge() {
+      const badge = document.getElementById('history-reward');
+      const claimed = localStorage.getItem('zeta_history_claimed');
+      if (badge && claimed) {
+        badge.textContent = 'Olindi ✓';
+        badge.classList.add('claimed');
+        badge.style.cursor = 'default';
+      }
+    }
+
+    function saveSettings() {
+      const settings = {
+        lang: document.getElementById("lang-select").value,
+        sound: document.getElementById("sound-toggle").checked,
+        notif: document.getElementById("notif-toggle").checked,
+        musicTrack: document.getElementById("music-select").value,
+        musicVolume: document.getElementById("music-volume").value,
+      };
+      localStorage.setItem("zeta_settings", JSON.stringify(settings));
+
+      if (window.ZetaMusic) {
+        ZetaMusic.setTrack(settings.musicTrack);
+        ZetaMusic.setVolume(settings.musicVolume);
+      }
+
+      // Save crypto refresh rate
+      const cryptoRefresh = document.getElementById("crypto-refresh").value;
+      localStorage.setItem("zeta_crypto_refresh", cryptoRefresh);
+
+      // Re-render history with new language
+      renderUpdateHistory();
+
+      if (settings.lang !== localStorage.getItem('_last_lang')) {
+        localStorage.setItem('_last_lang', settings.lang);
+        // Refresh to apply language changes
+        location.reload();
+      }
+    }
+
+    function loadSettings() {
+      const data = localStorage.getItem("zeta_settings");
+      if (data) {
+        const settings = JSON.parse(data);
+        document.getElementById("lang-select").value = settings.lang || "uz";
+        document.getElementById("sound-toggle").checked = settings.sound !== false;
+        document.getElementById("notif-toggle").checked = settings.notif !== false;
+        document.getElementById("music-select").value = settings.musicTrack || "off";
+        document.getElementById("music-volume").value = settings.musicVolume || 30;
+      }
+
+      const cryptoRefresh = localStorage.getItem("zeta_crypto_refresh");
+      if (cryptoRefresh) {
+        document.getElementById("crypto-refresh").value = cryptoRefresh;
+      }
+    }
+
+    function resetData() {
+      if (confirm("Barcha yig'ilgan XP va o'yin natijalari o'chiriladi. Aniqmi?")) {
+        localStorage.clear();
+        window.location.reload();
+      }
+    }
+
+    function claimFounderBonus() {
+      const claimed = localStorage.getItem('zeta_founder_bonus_claimed');
+      if (!claimed) {
+        if (typeof addXP === 'function') {
+          addXP(100);
+        } else {
+          let currentXP = parseInt(localStorage.getItem('zeta_xp') || '0');
+          currentXP += 100;
+          localStorage.setItem('zeta_xp', currentXP.toString());
+        }
+        localStorage.setItem('zeta_founder_bonus_claimed', 'true');
+        updateBonusBadge();
+        alert('+100 XP olindi! ZETA kanalimizga xush kelibsiz! 🎉');
+      }
+    }
+
+    function updateBonusBadge() {
+      const badge = document.getElementById('bonus-badge');
+      const claimed = localStorage.getItem('zeta_founder_bonus_claimed');
+      if (badge && claimed) {
+        badge.textContent = 'Olindi ✓';
+        badge.classList.add('claimed');
+      }
+    }
+
+    window.onload = function () {
+      loadSettings();
+      updateBonusBadge();
+      updateHistoryBadge();
+      renderUpdateHistory();
+
+      // Render achievements
+      if (typeof renderAchievementsSection === 'function') {
+        renderAchievementsSection('achievements-container');
+        const unlocked = typeof getUnlockedAchievements === 'function' ? getUnlockedAchievements() : [];
+        const countEl = document.getElementById('achieve-count');
+        if (countEl) countEl.textContent = `${unlocked.length}/9`;
+      }
+    };
+  </script>
+  <nav class="tab-bar"></nav>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZETA | Kalkulyator</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <h2><a href="../tools.html" style="text-decoration: none; color: inherit"><i class="fas fa-arrow-left"></i>
+          ZETA</a></h2>
+    </div>
+    <nav class="nav-links"></nav>
+  </header>
+
+  <main style="max-width: 360px">
+    <section class="glass-panel">
+      <h3 style="text-align: center; margin-bottom: 1rem;">🧮 Kalkulyator</h3>
+      <input type="text" id="calc-display" readonly style="
+            width: 100%;
+            margin-bottom: 0.75rem;
+            padding: 12px;
+            font-size: 1.8rem;
+            text-align: right;
+            border-radius: 10px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+          " />
+      <div class="calc-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+        <button onclick="appendCalc('7')">7</button>
+        <button onclick="appendCalc('8')">8</button>
+        <button onclick="appendCalc('9')">9</button>
+        <button onclick="setOp('/')" style="color: var(--primary-accent)">/</button>
+        <button onclick="appendCalc('4')">4</button>
+        <button onclick="appendCalc('5')">5</button>
+        <button onclick="appendCalc('6')">6</button>
+        <button onclick="setOp('*')" style="color: var(--primary-accent)">×</button>
+        <button onclick="appendCalc('1')">1</button>
+        <button onclick="appendCalc('2')">2</button>
+        <button onclick="appendCalc('3')">3</button>
+        <button onclick="setOp('-')" style="color: var(--primary-accent)">−</button>
+        <button onclick="appendCalc('0')">0</button>
+        <button onclick="appendCalc('.')">.</button>
+        <button onclick="calcResult()" style="background: var(--success)">=</button>
+        <button onclick="setOp('+')" style="color: var(--primary-accent)">+</button>
+        <button onclick="clearCalc()" style="grid-column: span 4; background: var(--danger); color: white">C</button>
+      </div>
+    </section>
+  </main>
+  <style>
+    .calc-grid button {
+      padding: 0.85rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: background 0.2s;
+    }
+
+    .calc-grid button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .calc-grid button:active {
+      transform: scale(0.95);
+    }
+  </style>
+  <script>
+    let calcBuffer = "";
+    function appendCalc(val) { calcBuffer += val; updateDisplay(); }
+    function setOp(op) { calcBuffer += op; updateDisplay(); }
+    function clearCalc() { calcBuffer = ""; updateDisplay(); }
+    function updateDisplay() { document.getElementById("calc-display").value = calcBuffer; }
+    function calcResult() {
+      try {
+        const res = eval(calcBuffer.replace('×', '*').replace('−', '-'));
+        document.getElementById("calc-display").value = res;
+        calcBuffer = String(res);
+        if (window.addXP) addXP(1);
+      } catch (e) {
+        document.getElementById("calc-display").value = "Error";
+        calcBuffer = "";
+      }
+    }
+  </script>
+</body>
+
+</html>

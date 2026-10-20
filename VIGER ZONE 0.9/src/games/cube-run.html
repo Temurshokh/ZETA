@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cube Run 3D | ZETA</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="../js/xp.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      touch-action: none;
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+
+    .hud-item {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px 20px;
+      border-radius: 20px;
+      color: white;
+      pointer-events: auto;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    #controls-hint {
+      position: absolute;
+      bottom: 100px;
+      width: 100%;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.8rem;
+    }
+
+    /* Touch control zones - visual feedback */
+    .touch-zone {
+      position: absolute;
+      top: 60px;
+      height: calc(100% - 120px);
+      width: 50%;
+      z-index: 5;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .touch-zone.active {
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    #zone-left {
+      left: 0;
+      border-right: none;
+    }
+
+    #zone-right {
+      right: 0;
+    }
+
+    .zone-indicator {
+      font-size: 3rem;
+      color: transparent;
+      pointer-events: none;
+    }
+
+    .touch-zone.active .zone-indicator {
+      color: transparent;
+    }
+  </style>
+  <script src="../js/core/music.js" defer></script>
+  <script src="../js/core/navigation.js" defer></script>
+</head>
+
+<body class="game-page">
+  <div id="canvas-container"></div>
+
+  <div id="ui-layer">
+    <div style="display: flex; justify-content: space-between">
+      <div class="hud-item">
+        <a href="../games.html" style="color: white; text-decoration: none">
+          <i class="fas fa-arrow-left"></i> Chiqish
+        </a>
+      </div>
+      <div class="hud-item">Score: <span id="score">0</span></div>
+    </div>
+    <div id="controls-hint">
+      PC: A/D yoki ← → | Mobile: Chap/O'ng tomonga bosib turing
+    </div>
+  </div>
+
+  <!-- Touch zones for hold-based steering -->
+  <div id="zone-left" class="touch-zone">
+    <span class="zone-indicator">←</span>
+  </div>
+  <div id="zone-right" class="touch-zone">
+    <span class="zone-indicator">→</span>
+  </div>
+
+  <script src="../js/game-ui.js"></script>
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.150.1/build/three.module.js"
+        }
+      }
+    </script>
+  <script type="module">
+    import * as THREE from "three";
+
+    // Scene Setup
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0f172a, 0.04);
+    scene.background = new THREE.Color(0x0f172a);
+
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
+    camera.position.z = 5;
+    camera.position.y = 2;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.getElementById("canvas-container").appendChild(renderer.domElement);
+
+    // Lights
+    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    light.position.set(0, 20, 0);
+    scene.add(light);
+    const dirLight = new THREE.DirectionalLight(0xffffff);
+    dirLight.position.set(-3, 10, -10);
+    scene.add(dirLight);
+
+    // Floor
+    const planeGeo = new THREE.PlaneGeometry(200, 200, 20, 20);
+    const planeMat = new THREE.MeshPhongMaterial({
+      color: 0x1e293b,
+      shininess: 0,
+      wireframe: true,
+    });
+    const floor = new THREE.Mesh(planeGeo, planeMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1;
+    scene.add(floor);
+
+    // Player Cube
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshPhongMaterial({ color: 0x3b82f6 });
+    const player = new THREE.Mesh(geometry, material);
+    scene.add(player);
+
+    // Obstacles
+    let obstacles = [];
+    const obstacleGeo = new THREE.BoxGeometry(1, 1, 1);
+    const obstacleMat = new THREE.MeshPhongMaterial({ color: 0xef4444 });
+
+    // Game State
+    let score = 0;
+    let speed = 0.2;
+    let gameOver = false;
+    let spawnInterval;
+    let animationId;
+    let targetX = 0;
+
+    // Touch steer state - for hold-based steering
+    let touchSteerDirection = 0; // -1 left, 0 none, 1 right
+
+    function initGame() {
+      gameOver = false;
+      score = 0;
+      speed = 0.2;
+      targetX = 0;
+      touchSteerDirection = 0;
+      document.getElementById("score").innerText = score;
+
+      obstacles.forEach((o) => scene.remove(o));
+      obstacles = [];
+
+      player.position.x = 0;
+
+      if (spawnInterval) clearInterval(spawnInterval);
+      spawnInterval = setInterval(() => {
+        if (!gameOver) spawnObstacle();
+      }, 1000);
+
+      animate();
+    }
+
+    function spawnObstacle() {
+      if (gameOver) return;
+      const obs = new THREE.Mesh(obstacleGeo, obstacleMat);
+      obs.position.z = -50;
+      obs.position.x = Math.random() * 8 - 4;
+      scene.add(obs);
+      obstacles.push(obs);
+    }
+
+    // Keyboard Input
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "a") targetX -= 2;
+      if (e.key === "ArrowRight" || e.key === "d") targetX += 2;
+    });
+
+    // Touch zones - HOLD to steer continuously
+    const zoneLeft = document.getElementById('zone-left');
+    const zoneRight = document.getElementById('zone-right');
+
+    function setupTouchZone(el, direction) {
+      const startSteer = (e) => {
+        e.preventDefault();
+        touchSteerDirection = direction;
+        el.classList.add('active');
+      };
+
+      const stopSteer = (e) => {
+        if (touchSteerDirection === direction) {
+          touchSteerDirection = 0;
+        }
+        el.classList.remove('active');
+      };
+
+      el.addEventListener('touchstart', startSteer, { passive: false });
+      el.addEventListener('mousedown', startSteer);
+      el.addEventListener('touchend', stopSteer);
+      el.addEventListener('touchcancel', stopSteer);
+      el.addEventListener('mouseup', stopSteer);
+      el.addEventListener('mouseleave', stopSteer);
+    }
+
+    setupTouchZone(zoneLeft, -1);
+    setupTouchZone(zoneRight, 1);
+
+    // Game Loop
+    function animate() {
+      if (gameOver) return;
+      animationId = requestAnimationFrame(animate);
+
+      // Apply continuous touch steering
+      if (touchSteerDirection !== 0) {
+        targetX += touchSteerDirection * 0.15;
+      }
+
+      // Clamp targetX
+      targetX = Math.max(-5, Math.min(5, targetX));
+
+      // Move Floor
+      floor.position.z += speed;
+      if (floor.position.z > 10) floor.position.z = 0;
+
+      // Player movement
+      player.position.x += (targetX - player.position.x) * 0.1;
+      camera.position.x += (player.position.x * 0.3 - camera.position.x) * 0.1;
+
+      // Obstacles Logic
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.position.z += speed * 2;
+
+        // Collision check
+        const diffZ = obs.position.z - player.position.z;
+        const diffX = obs.position.x - player.position.x;
+
+        if (Math.abs(diffZ) < 0.9 && Math.abs(diffX) < 0.9) {
+          endGame();
+          return;
+        }
+
+        if (obs.position.z > 5) {
+          scene.remove(obs);
+          obstacles.splice(i, 1);
+          score++;
+          document.getElementById("score").innerText = score;
+          if (score % 10 === 0) {
+            speed += 0.05;
+            if (window.addXP) addXP(5);
+          }
+        }
+      }
+
+      // Player rotation effect
+      player.rotation.z -= speed;
+      player.rotation.x -= speed;
+
+      renderer.render(scene, camera);
+    }
+
+    function endGame() {
+      gameOver = true;
+      cancelAnimationFrame(animationId);
+      clearInterval(spawnInterval);
+
+      // Reset touch state
+      touchSteerDirection = 0;
+      document.querySelectorAll('.touch-zone').forEach(z => z.classList.remove('active'));
+
+      if (window.GameUI) {
+        window.GameUI.showGameOver(score, initGame);
+      } else {
+        alert("Game Over! Score: " + score);
+        initGame();
+      }
+    }
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Settings integration
+    function applySettings(settings) {
+      if (settings.graphics === 'low') {
+        renderer.setPixelRatio(0.8);
+      } else if (settings.graphics === 'medium') {
+        renderer.setPixelRatio(1.0);
+      } else {
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      }
+    }
+
+    window.addEventListener('gameSettingsChanged', (e) => {
+      applySettings(e.detail);
+    });
+
+    setTimeout(() => {
+      if (window.GameUI && window.GameUI.getSettings) {
+        applySettings(window.GameUI.getSettings());
+      }
+    }, 100);
+
+    initGame();
+  </script>
+</body>
+
+</html>
